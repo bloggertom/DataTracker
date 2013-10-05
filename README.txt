@@ -2,15 +2,22 @@ An application which recored at different locations the speed of
 the iphones data connection and places an overlay on a MKMapView
 of varying alphas to indicate the resulting speed.
 
-So far there is no reliable way to find out the iphones data
-download speed. One possibility is to perform a speed test in app.
-This is what I have worked on so far but with rubbish results.
+So far there is no reliable way to find out the iphones current data
+connection type(3G/GPRS/EDGE/CDMA) progmatically. To overcome this a 
+small speed test is run every time the location updates. It 
+downloads a defined amount of a 5MB file taking samples of the
+download speed. An average is found for these speeds and used as the
+result.
 
-Overlays could also be better. It would be better to use a path
-of points instead of a simple circle and create a blob for places
-that the tests have been run and vairy the alpha across the blob,
-if possable. Maybe lots of blobs with fethered edges would work.
+Overlays could also be better. This is currently in development
+it is hoped that overlays that overlap can be combined. It would
+also be nice to have the edges feather out. I think this will be
+possable by extending MKOverlayPathRenderer and overriding
+fillPath:inContext:.
 
-CoreData also need implamenting
+This app currently only supports 3G speeds ~ 10-15Mbs
+
+CoreData also needs implamenting but is awayting MKOverlays to be
+finished.
 
 Created for iOS 7.

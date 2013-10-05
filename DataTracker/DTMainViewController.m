@@ -69,7 +69,7 @@
 	_speedTester = [[DTSpeedTester alloc]init];
 	_speedTester.callback = self;
 	
-	self.view = _mapview;
+	[self.view addSubview:_mapview];
 	[self setUpUI];
 }
 
@@ -97,7 +97,7 @@
 	self.tracking = YES;
 	
 #if DEBUG_OVERLAYS
-	double delayInSeconds = 5.0;
+	double delayInSeconds = 4.0;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
 		[self speedTesterDidFinishSpeedTestWithResult:10];
@@ -142,6 +142,6 @@
 		//y = 1 + (x-A)*(0.7-0)/(B-A), RANGE A-B
 	
 	double alpha = Mbs * 0.7 / MaxSpeed;
-	[self.mapViewDelegate addOverlayWithAlpha:alpha atLocation:_currentLocation toMapView:_mapview];
+	[self.mapViewDelegate addOverlayWithAlpha:alpha atLocation:_locationManager.location toMapView:_mapview];
 }
 @end
