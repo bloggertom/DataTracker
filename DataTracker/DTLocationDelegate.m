@@ -8,19 +8,19 @@
 
 #import "DTLocationDelegate.h"
 #import "Reachability.h"
-
+#import "DTMainViewController.h"
 
 @interface DTLocationDelegate()
 
 @property(nonatomic, strong)Reachability *reachability;
 
+
 @end
 @implementation DTLocationDelegate
 
--(id)initWithMapView:(MKMapView *)mapView{
+-(id)init{
 	self = [super init];
 	if(self){
-		_mapView = mapView;
 		_reachability = [[Reachability alloc]init];
 		[_reachability setReachableOnWWAN:YES];
 		
@@ -29,22 +29,10 @@
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
-	NSLog(@"Updating location");
-	CLLocation *location = (CLLocation *)[locations firstObject];
-	NSLog(@"%@", location.debugDescription);
-	MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
-	/*
-	for(id<MKOverlay> overlay in [self.mapView overlaysInLevel:MKOverlayLevelAboveLabels]){
-		if ([overlay intersectsMapRect:circle.boundingMapRect] && [overlay isKindOfClass:[MKCircle class]]) {
-			NSLog(@"Returning");
-			return;
-		}
-	}
-	*/
-	NSLog(@"%@", _mapView.delegate.debugDescription);
-	[self.mapView addOverlay:circle level:MKOverlayLevelAboveLabels];
+	
+	[_callback locationManagerHasUpdatedToLoaction:[locations firstObject]];
+	
 	
 }
-
 
 @end

@@ -8,13 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import	<MapKit/MapKit.h>
-
+@class DTMainViewController;
 @interface DTLocationDelegate : NSObject <CLLocationManagerDelegate>
 
-@property (nonatomic, weak)MKMapView *mapView;
-@property (nonatomic, getter = isTracking)BOOL tracking;
 
 
--(id)initWithMapView:(MKMapView *)mapView;
+@property (nonatomic, weak)DTMainViewController *callback;
 
 @end

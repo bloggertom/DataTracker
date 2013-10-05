@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-
+@class DTMainViewController;
 @interface DTSpeedTester : NSObject <NSURLConnectionDataDelegate>
 
 @property (nonatomic, strong)NSURLRequest *request;
+@property (nonatomic, weak, setter=delegate:)DTMainViewController *callback;
 
--(double)checkSpeed;
+-(void)checkSpeed;
 
 @end

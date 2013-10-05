@@ -15,4 +15,6 @@
 @property (nonatomic, weak)DTMainViewController *callback;
 
 
+-(void)addOverlayWithAlpha:(CGFloat)alpha atLocation:(CLLocation*)location toMapView:(MKMapView *)mapView;
+
 @end

@@ -28,6 +28,7 @@
 	
 	_reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
 	_reachability.reachableOnWWAN = YES;
+	_mainController.reach = _reachability;
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(reachabilityChanged:)

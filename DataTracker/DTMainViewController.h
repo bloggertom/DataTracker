@@ -11,14 +11,18 @@
 
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
-
+@class Reachability;
 @interface DTMainViewController : UIViewController
 
 @property (nonatomic, readonly, strong)MKMapView *mapview;
 @property (nonatomic, getter = isTracking)BOOL tracking;
+@property (nonatomic, weak)Reachability *reach;
+@property (nonatomic, strong)UILabel *progressLabel;
 
 -(void)beginTracking;
 -(void)stopTracking;
--(void)mapFinishedInicialRenderingSuccessfully:(BOOL)success;
-
+-(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success;
+-(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location;
+-(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs;
+-(void)speedTesterProgressDidChange:(int)perProgress;
 @end

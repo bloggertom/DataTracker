@@ -12,6 +12,7 @@
 @interface DTMapViewDelegate ()
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property (nonatomic)BOOL inicialRender;
+@property (nonatomic)CGFloat alpha;
 @end
 
 @implementation DTMapViewDelegate
@@ -27,20 +28,25 @@
 -(void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered{
 	if (_inicialRender) {//required for first overlay.
 		
-		[self.callback mapFinishedInicialRenderingSuccessfully:(BOOL)fullyRendered];
+		[self.callback mapFinishedInitialRenderingSuccessfully:(BOOL)fullyRendered];
 		_inicialRender = NO;
 	}
+}
+
+-(void)addOverlayWithAlpha:(CGFloat)alpha atLocation:(CLLocation*)location toMapView:(MKMapView *)mapView{
+	NSLog(@"Adding overlay with alpha %f",alpha);
+	NSAssert([mapView.delegate isKindOfClass:[self class]], [NSString stringWithFormat:@"Unable to add overlay to map view with invalid delegate"]);
+	_alpha = alpha;
+	MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
+	[mapView addOverlay:circle level:MKOverlayLevelAboveLabels];
 }
 
 -(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
 	NSLog(@"adding overlay");
 	if ([overlay isKindOfClass:[MKCircle class]]) {
 		MKCircleRenderer *renderer = [[MKCircleRenderer alloc]initWithOverlay:overlay];
-		double speed = [self.speedTester checkSpeed];
 		renderer.fillColor = [UIColor blueColor];
-		renderer.alpha = (speed > 10)? 1 : speed/10;
-		
-		NSLog(@"Speed %f", speed);
+		renderer.alpha = _alpha;
 		return renderer;
 	}
 	
