@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
 		DBF984E117FF2E2D00A75DF1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E017FF2E2D00A75DF1 /* Foundation.framework */; };
 		DBF984E317FF2E2D00A75DF1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E217FF2E2D00A75DF1 /* CoreGraphics.framework */; };
 		DBF984E517FF2E2D00A75DF1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E417FF2E2D00A75DF1 /* UIKit.framework */; };
@@ -22,6 +23,13 @@
 		DBF9850217FF2E2D00A75DF1 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E617FF2E2D00A75DF1 /* CoreData.framework */; };
 		DBF9850A17FF2E2E00A75DF1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DBF9850817FF2E2E00A75DF1 /* InfoPlist.strings */; };
 		DBF9850C17FF2E2E00A75DF1 /* DataTrackerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF9850B17FF2E2E00A75DF1 /* DataTrackerTests.m */; };
+		DBF9851717FF2E3E00A75DF1 /* DTMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF9851617FF2E3E00A75DF1 /* DTMainViewController.m */; };
+		DBF9851C17FF2EC200A75DF1 /* DTMapViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF9851B17FF2EC200A75DF1 /* DTMapViewDelegate.m */; };
+		DBF9851F17FF300500A75DF1 /* DTLocationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */; };
+		DBF9852117FF3D2D00A75DF1 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF9852017FF3D2D00A75DF1 /* MapKit.framework */; };
+		DBF9852317FF3D4400A75DF1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF9852217FF3D4400A75DF1 /* CoreLocation.framework */; };
+		DBF9852517FF49CA00A75DF1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF9852417FF49CA00A75DF1 /* SystemConfiguration.framework */; };
+		DBF9852817FF4A3200A75DF1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF9852717FF4A3200A75DF1 /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSpeedTester.h; sourceTree = "<group>"; };
+		DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTSpeedTester.m; sourceTree = "<group>"; };
 		DBF984DD17FF2E2D00A75DF1 /* DataTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DataTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF984E017FF2E2D00A75DF1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DBF984E217FF2E2D00A75DF1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -53,6 +63,17 @@
 		DBF9850717FF2E2E00A75DF1 /* DataTrackerTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DataTrackerTests-Info.plist"; sourceTree = "<group>"; };
 		DBF9850917FF2E2E00A75DF1 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DBF9850B17FF2E2E00A75DF1 /* DataTrackerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataTrackerTests.m; sourceTree = "<group>"; };
+		DBF9851517FF2E3E00A75DF1 /* DTMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMainViewController.h; sourceTree = "<group>"; };
+		DBF9851617FF2E3E00A75DF1 /* DTMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMainViewController.m; sourceTree = "<group>"; };
+		DBF9851A17FF2EC200A75DF1 /* DTMapViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMapViewDelegate.h; sourceTree = "<group>"; };
+		DBF9851B17FF2EC200A75DF1 /* DTMapViewDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMapViewDelegate.m; sourceTree = "<group>"; };
+		DBF9851D17FF300500A75DF1 /* DTLocationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTLocationDelegate.h; sourceTree = "<group>"; };
+		DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTLocationDelegate.m; sourceTree = "<group>"; };
+		DBF9852017FF3D2D00A75DF1 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		DBF9852217FF3D4400A75DF1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		DBF9852417FF49CA00A75DF1 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		DBF9852617FF4A3200A75DF1 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		DBF9852717FF4A3200A75DF1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +81,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBF9852517FF49CA00A75DF1 /* SystemConfiguration.framework in Frameworks */,
+				DBF9852317FF3D4400A75DF1 /* CoreLocation.framework in Frameworks */,
+				DBF9852117FF3D2D00A75DF1 /* MapKit.framework in Frameworks */,
 				DBF984E317FF2E2D00A75DF1 /* CoreGraphics.framework in Frameworks */,
 				DBF984E717FF2E2D00A75DF1 /* CoreData.framework in Frameworks */,
 				DBF984E517FF2E2D00A75DF1 /* UIKit.framework in Frameworks */,
@@ -103,6 +127,9 @@
 		DBF984DF17FF2E2D00A75DF1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DBF9852417FF49CA00A75DF1 /* SystemConfiguration.framework */,
+				DBF9852217FF3D4400A75DF1 /* CoreLocation.framework */,
+				DBF9852017FF3D2D00A75DF1 /* MapKit.framework */,
 				DBF984E017FF2E2D00A75DF1 /* Foundation.framework */,
 				DBF984E217FF2E2D00A75DF1 /* CoreGraphics.framework */,
 				DBF984E417FF2E2D00A75DF1 /* UIKit.framework */,
@@ -115,11 +142,21 @@
 		DBF984E817FF2E2D00A75DF1 /* DataTracker */ = {
 			isa = PBXGroup;
 			children = (
+				DBF9852617FF4A3200A75DF1 /* Reachability.h */,
+				DBF9852717FF4A3200A75DF1 /* Reachability.m */,
 				DBF984F117FF2E2D00A75DF1 /* DTAppDelegate.h */,
 				DBF984F217FF2E2D00A75DF1 /* DTAppDelegate.m */,
+				DBF9851517FF2E3E00A75DF1 /* DTMainViewController.h */,
+				DBF9851617FF2E3E00A75DF1 /* DTMainViewController.m */,
 				DBF984F717FF2E2D00A75DF1 /* Images.xcassets */,
 				DBF984F417FF2E2D00A75DF1 /* DataTracker.xcdatamodeld */,
 				DBF984E917FF2E2D00A75DF1 /* Supporting Files */,
+				DBF9851A17FF2EC200A75DF1 /* DTMapViewDelegate.h */,
+				DBF9851B17FF2EC200A75DF1 /* DTMapViewDelegate.m */,
+				DBF9851D17FF300500A75DF1 /* DTLocationDelegate.h */,
+				DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */,
+				DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */,
+				DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */,
 			);
 			path = DataTracker;
 			sourceTree = "<group>";
@@ -201,6 +238,13 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Thomas Wilson";
 				TargetAttributes = {
+					DBF984DC17FF2E2D00A75DF1 = {
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
+					};
 					DBF984FC17FF2E2D00A75DF1 = {
 						TestTargetID = DBF984DC17FF2E2D00A75DF1;
 					};
@@ -250,8 +294,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBF984F317FF2E2D00A75DF1 /* DTAppDelegate.m in Sources */,
+				DBF9851717FF2E3E00A75DF1 /* DTMainViewController.m in Sources */,
+				DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */,
+				DBF9851C17FF2EC200A75DF1 /* DTMapViewDelegate.m in Sources */,
+				DBF9852817FF4A3200A75DF1 /* Reachability.m in Sources */,
 				DBF984F617FF2E2D00A75DF1 /* DataTracker.xcdatamodeld in Sources */,
 				DBF984EF17FF2E2D00A75DF1 /* main.m in Sources */,
+				DBF9851F17FF300500A75DF1 /* DTLocationDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,6 +501,7 @@
 				DBF9851117FF2E2E00A75DF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DBF9851217FF2E2E00A75DF1 /* Build configuration list for PBXNativeTarget "DataTrackerTests" */ = {
 			isa = XCConfigurationList;
@@ -460,6 +510,7 @@
 				DBF9851417FF2E2E00A75DF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
