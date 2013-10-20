@@ -9,12 +9,14 @@
 #import "DTMapViewDelegate.h"
 #import "DTSpeedTester.h"
 #import "DTMainViewController.h"
+#import "DTMergableCircleOverlay.h"
+#import "DTMergableRenderer.h"
 
 #define   DEGREES_TO_RADIANS(degrees)  ((M_PI * degrees)/ 180)
 @interface DTMapViewDelegate ()
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property (nonatomic)BOOL inicialRender;
-@property (nonatomic)CGFloat alpha;
+	//@property (nonatomic)CGFloat alpha;
 @end
 
 @implementation DTMapViewDelegate
@@ -38,48 +40,46 @@
 -(void)addOverlayWithAlpha:(CGFloat)alpha atLocation:(CLLocation*)location toMapView:(MKMapView *)mapView{
 	NSLog(@"Adding overlay with alpha %f",alpha);
 	NSAssert([mapView.delegate isKindOfClass:[self class]], [NSString stringWithFormat:@"Unable to add overlay to map view with invalid delegate"]);
-	_alpha = alpha;
-	MKCircle *circle = [MKCircle circleWithCenterCoordinate:mapView.userLocation.location.coordinate radius:200];
+	mapView.delegate = self;
+		//MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
+	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
 	
-	[mapView addOverlay:circle level:MKOverlayLevelAboveLabels];
-	
+	circle.alpha = alpha;
+	[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
 }
 
 -(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
 	NSLog(@"adding overlay");
-	if ([overlay isKindOfClass:[MKCircle class]]) {
-		MKCircleRenderer *crenderer = [[MKCircleRenderer alloc]initWithOverlay:overlay];
-		MKOverlayPathRenderer *renderer = [[MKOverlayPathRenderer alloc]init];
-		MKCircle *circle = (MKCircle *)overlay;
+		//MKOverlayPathRenderer *renderer;
+	DTMergableRenderer *renderer;
+	
+	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
+		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
 		
 		
-			//Kept for referance
-		/*MKMapPoint a = circle.boundingMapRect.origin;
-		MKMapPoint b = MKMapPointMake(circle.boundingMapRect.origin.x + circle.boundingMapRect.size.width, circle.boundingMapRect.origin.y);
-		MKMapPoint c = MKMapPointMake(circle.boundingMapRect.origin.x + circle.boundingMapRect.size.width, circle.boundingMapRect.origin.y + circle.boundingMapRect.size.height);
-		MKMapPoint d = MKMapPointMake(circle.boundingMapRect.origin.x, circle.boundingMapRect.origin.y + circle.boundingMapRect.size.height);
-		
-		MKMapPoint *points = malloc(4 * sizeof(MKMapPoint));
-		
-		points[0] = a;
-		points[1] = b;
-		points[2] = c;
-		points[3] = d;
-		
-		MKPolygon *poly = [MKPolygon polygonWithPoints:points count:4];
-		MKPolygonRenderer *prenderer = [[MKPolygonRenderer alloc]initWithPolygon:poly];*/
-		CGRect rect = [crenderer rectForMapRect:circle.boundingMapRect];
-		UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:circle.radius*7];
-		renderer.path = [path CGPath];
+		NSArray *overlays = [mapView overlaysInLevel:MKOverlayLevelAboveRoads];
+		NSMutableArray *array = [[NSMutableArray alloc]init];
+		[array addObject:circle];
+		for (id<MKOverlay> o in overlays) {
+			if (![o isEqual:overlay] && [o intersectsMapRect:circle.boundingMapRect]) {
+				CLLocation *location = [[CLLocation alloc]initWithLatitude:[o coordinate].latitude longitude:[o coordinate].longitude];
+				CLLocation *location2 = [[CLLocation alloc]initWithLatitude:[circle coordinate].latitude longitude:[circle coordinate].longitude];
+				if ([location distanceFromLocation:location2] > 100) {
+					[array addObject:o];
+					[mapView removeOverlay:o];
+				}
+			}
+		}
+		NSLog(@"Overlays %d", array.count);
+		renderer = [[DTMergableRenderer alloc]initWithOverlays:array];
 		renderer.fillColor = [UIColor blueColor];
-		renderer.alpha = _alpha;
+		renderer.alpha = circle.alpha;
 		
-			//free(points);
-		return renderer;
 	}
 	
-	return nil;
+	return renderer;
 }
+
 
 
 @end

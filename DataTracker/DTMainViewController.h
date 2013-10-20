@@ -12,7 +12,7 @@
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
 @class Reachability;
-@interface DTMainViewController : UIViewController
+@interface DTMainViewController : UIViewController <MKMapViewDelegate>
 
 @property (nonatomic, readonly, strong)MKMapView *mapview;
 @property (nonatomic, getter = isTracking)BOOL tracking;

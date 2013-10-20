@@ -30,7 +30,7 @@
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
 	
-	[_callback locationManagerHasUpdatedToLoaction:[locations firstObject]];
+	[_callback locationManagerHasUpdatedToLoaction:manager.location];
 	
 	
 }

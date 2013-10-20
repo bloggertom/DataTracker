@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
+		DBF8C49B18132A73001911C9 /* DTMergableCircleOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */; };
+		DBF8C49E18134454001911C9 /* DTMergableRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49D18134454001911C9 /* DTMergableRenderer.m */; };
 		DBF984E117FF2E2D00A75DF1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E017FF2E2D00A75DF1 /* Foundation.framework */; };
 		DBF984E317FF2E2D00A75DF1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E217FF2E2D00A75DF1 /* CoreGraphics.framework */; };
 		DBF984E517FF2E2D00A75DF1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E417FF2E2D00A75DF1 /* UIKit.framework */; };
@@ -43,8 +45,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DB19321C1807030E000023CD /* DataTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = DataTracker.entitlements; sourceTree = "<group>"; };
 		DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSpeedTester.h; sourceTree = "<group>"; };
 		DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTSpeedTester.m; sourceTree = "<group>"; };
+		DBF8C49918132A73001911C9 /* DTMergableCircleOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMergableCircleOverlay.h; sourceTree = "<group>"; };
+		DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMergableCircleOverlay.m; sourceTree = "<group>"; };
+		DBF8C49C18134454001911C9 /* DTMergableRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMergableRenderer.h; sourceTree = "<group>"; };
+		DBF8C49D18134454001911C9 /* DTMergableRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMergableRenderer.m; sourceTree = "<group>"; };
 		DBF984DD17FF2E2D00A75DF1 /* DataTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DataTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF984E017FF2E2D00A75DF1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		DBF984E217FF2E2D00A75DF1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -142,6 +149,7 @@
 		DBF984E817FF2E2D00A75DF1 /* DataTracker */ = {
 			isa = PBXGroup;
 			children = (
+				DB19321C1807030E000023CD /* DataTracker.entitlements */,
 				DBF9852617FF4A3200A75DF1 /* Reachability.h */,
 				DBF9852717FF4A3200A75DF1 /* Reachability.m */,
 				DBF984F117FF2E2D00A75DF1 /* DTAppDelegate.h */,
@@ -153,6 +161,10 @@
 				DBF984E917FF2E2D00A75DF1 /* Supporting Files */,
 				DBF9851A17FF2EC200A75DF1 /* DTMapViewDelegate.h */,
 				DBF9851B17FF2EC200A75DF1 /* DTMapViewDelegate.m */,
+				DBF8C49918132A73001911C9 /* DTMergableCircleOverlay.h */,
+				DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */,
+				DBF8C49C18134454001911C9 /* DTMergableRenderer.h */,
+				DBF8C49D18134454001911C9 /* DTMergableRenderer.m */,
 				DBF9851D17FF300500A75DF1 /* DTLocationDelegate.h */,
 				DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */,
 				DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */,
@@ -239,8 +251,12 @@
 				ORGANIZATIONNAME = "Thomas Wilson";
 				TargetAttributes = {
 					DBF984DC17FF2E2D00A75DF1 = {
+						DevelopmentTeam = BQ2U65ZE29;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -294,9 +310,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBF984F317FF2E2D00A75DF1 /* DTAppDelegate.m in Sources */,
+				DBF8C49B18132A73001911C9 /* DTMergableCircleOverlay.m in Sources */,
 				DBF9851717FF2E3E00A75DF1 /* DTMainViewController.m in Sources */,
 				DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */,
 				DBF9851C17FF2EC200A75DF1 /* DTMapViewDelegate.m in Sources */,
+				DBF8C49E18134454001911C9 /* DTMergableRenderer.m in Sources */,
 				DBF9852817FF4A3200A75DF1 /* Reachability.m in Sources */,
 				DBF984F617FF2E2D00A75DF1 /* DataTracker.xcdatamodeld in Sources */,
 				DBF984EF17FF2E2D00A75DF1 /* main.m in Sources */,
@@ -419,10 +437,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = DataTracker/DataTracker.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DataTracker/DataTracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/DataTracker-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -432,10 +454,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = DataTracker/DataTracker.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DataTracker/DataTracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/DataTracker-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

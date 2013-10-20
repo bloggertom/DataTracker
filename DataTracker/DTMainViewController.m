@@ -13,6 +13,7 @@
 #import "DTSpeedTester.h"
 
 #define DEBUG_OVERLAYS 0
+#define FIELD_TEST 1
 #define MaxSpeed 10
 #define MinSpeed 0
 @interface DTMainViewController ()
@@ -45,7 +46,7 @@
 	_mapViewDelegate = [[DTMapViewDelegate alloc]init];
 	_mapViewDelegate.callback = self;
 	_mapview.delegate = _mapViewDelegate;
-	
+	_mapview.showsUserLocation = YES;
 	
 	
 		//set up location manager
@@ -59,15 +60,16 @@
 	_locationManager.pausesLocationUpdatesAutomatically = YES;
 	
 		//centering map view
-	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(_mapview.userLocation.coordinate, 500, 500)];
+	
 	
 		//track user location. May not be needed?
-	[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
+		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
 	
 	
 		//speedTester
 	_speedTester = [[DTSpeedTester alloc]init];
 	_speedTester.callback = self;
+	
 	
 	[self.view addSubview:_mapview];
 	[self setUpUI];
@@ -77,6 +79,7 @@
 	_progressLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 200, 50)];
 	_progressLabel.alpha = 0;
 	[self.view addSubview:_progressLabel];
+	
 }
 
 - (void)didReceiveMemoryWarning
@@ -93,23 +96,38 @@
 
 -(void)beginTracking{
 	NSLog(@"Tracking");
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 500, 500)animated:YES];
 	[self.locationManager startMonitoringSignificantLocationChanges];
 	self.tracking = YES;
 	
 #if DEBUG_OVERLAYS
+	_currentLocation = self.locationManager.location;
 	double delayInSeconds = 4.0;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
 		[self speedTesterDidFinishSpeedTestWithResult:10];
 	});
-	
+	/*
+	delayInSeconds = 4.0;
+	popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		MKMapPoint point = MKMapPointForCoordinate(_currentLocation.coordinate);
+		CLLocationDistance distancePerPoint = MKMetersPerMapPointAtLatitude(_currentLocation.coordinate.latitude);
+		double deltaPoint = 100/distancePerPoint;
+		point.x +=deltaPoint;
+		CLLocationCoordinate2D new = MKCoordinateForMapPoint(point);
+		CLLocation *newLocation = [[CLLocation alloc]initWithLatitude:new.latitude longitude: new.longitude];
+		_currentLocation = newLocation;
+		[self speedTesterDidFinishSpeedTestWithResult:10];
+	});
+	*/
 #endif
 }
 
 
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success{
 	[self.reach startNotifier];
-	
+	NSLog(@"Moo");
 	if(self.reach.isReachableViaWWAN){
 		double delayInSeconds = 2.0;
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
@@ -123,25 +141,48 @@
 #pragma mark - Overlay addition
 #pragma mark - Location Updates
 -(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location{
+
+	_currentLocation = location;
 	NSLog(@"new location update");
 	self.progressLabel.text = @"Testing Connection";
 	[UIView animateWithDuration:0.5 animations:^{
 		self.progressLabel.alpha = 1;
 	} completion:^(BOOL finished) {
-		_currentLocation = location;
+		
+#if !FIELD_TEST
 		[_speedTester checkSpeed];
+#elif FIELD_TEST
+		double delayInSeconds = 2.0;
+		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform(10)+1];
+		});
+#endif
 	}];
+
 }
 
 #pragma mark - Speed Test delegate methods
 -(void)speedTesterProgressDidChange:(int)perProgress{
 	self.progressLabel.text = [NSString stringWithFormat:@"%d%%",perProgress];
+	self.progressLabel.alpha = 1;
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
 	NSLog(@"Finished with Mbs %f",Mbs);
 		//y = 1 + (x-A)*(0.7-0)/(B-A), RANGE A-B
+	double alpha = Mbs * 0.8 / MaxSpeed;
 	
-	double alpha = Mbs * 0.7 / MaxSpeed;
-	[self.mapViewDelegate addOverlayWithAlpha:alpha atLocation:_locationManager.location toMapView:_mapview];
+	CLLocation *location = [_currentLocation copy];
+	
+	[self.mapViewDelegate addOverlayWithAlpha:alpha atLocation:location toMapView:_mapview];
+	
+	[UIView animateWithDuration:2 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+		self.progressLabel.alpha = 0;
+	} completion:nil];
+}
+
+-(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
+	NSLog(@"Called");
+	return nil;
 }
 @end
