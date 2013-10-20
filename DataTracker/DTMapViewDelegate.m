@@ -42,7 +42,7 @@
 	NSAssert([mapView.delegate isKindOfClass:[self class]], [NSString stringWithFormat:@"Unable to add overlay to map view with invalid delegate"]);
 	mapView.delegate = self;
 		//MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
-	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
+	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:100];
 	
 	circle.alpha = alpha;
 	[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
@@ -67,13 +67,15 @@
 				if ([location distanceFromLocation:location2] > 100) {
 					[array addObject:o];
 					[mapView removeOverlay:o];
+				}else{
+					[mapView removeOverlay:o];
 				}
 			}
 		}
 		NSLog(@"Overlays %d", array.count);
 		renderer = [[DTMergableRenderer alloc]initWithOverlays:array];
 		renderer.fillColor = [UIColor blueColor];
-		renderer.alpha = circle.alpha;
+			//renderer.alpha = circle.alpha;
 		
 	}
 	
