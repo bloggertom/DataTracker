@@ -13,6 +13,7 @@
 #import "DTMergableRenderer.h"
 
 #define   DEGREES_TO_RADIANS(degrees)  ((M_PI * degrees)/ 180)
+#define kMIN_DISTANCE 250
 @interface DTMapViewDelegate ()
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property (nonatomic)BOOL inicialRender;
@@ -36,52 +37,48 @@
 		_inicialRender = NO;
 	}
 }
-
 -(void)addOverlayWithAlpha:(CGFloat)alpha atLocation:(CLLocation*)location toMapView:(MKMapView *)mapView{
 	NSLog(@"Adding overlay with alpha %f",alpha);
 	NSAssert([mapView.delegate isKindOfClass:[self class]], [NSString stringWithFormat:@"Unable to add overlay to map view with invalid delegate"]);
 	mapView.delegate = self;
 		//MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
-	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:100];
+	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
+	NSArray *array = [mapView overlaysInLevel:MKOverlayLevelAboveRoads];
+	
+	for (id<MKOverlay> o in array) {
+		if ([o isKindOfClass:[DTMergableCircleOverlay class]]) {
+			DTMergableCircleOverlay *overlay = (DTMergableCircleOverlay*)o;
+			CLLocation *location = [[CLLocation alloc]initWithLatitude:overlay.coordinate.latitude longitude:overlay.coordinate.longitude];
+			CLLocation *location2 = [[CLLocation alloc]initWithLatitude:circle.coordinate.latitude longitude:circle.coordinate.longitude];
+			if ([location distanceFromLocation:location2] < kMIN_DISTANCE) {
+				[mapView removeOverlay:o];
+				[self.callback mapViewDelegateDidRemoveOverlay:o];
+			}
+		}
+	}
+	
 	
 	circle.alpha = alpha;
 	[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
+	[self.callback mapViewDelegateDidAddOverlay:circle];
 }
 
 -(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
 	NSLog(@"adding overlay");
-		//MKOverlayPathRenderer *renderer;
+		
 	DTMergableRenderer *renderer;
 	
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
 		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
 		
-		
-		NSArray *overlays = [mapView overlaysInLevel:MKOverlayLevelAboveRoads];
-		NSMutableArray *array = [[NSMutableArray alloc]init];
-		[array addObject:circle];
-		for (id<MKOverlay> o in overlays) {
-			if (![o isEqual:overlay] && [o intersectsMapRect:circle.boundingMapRect]) {
-				CLLocation *location = [[CLLocation alloc]initWithLatitude:[o coordinate].latitude longitude:[o coordinate].longitude];
-				CLLocation *location2 = [[CLLocation alloc]initWithLatitude:[circle coordinate].latitude longitude:[circle coordinate].longitude];
-				if ([location distanceFromLocation:location2] > 100) {
-					[array addObject:o];
-					[mapView removeOverlay:o];
-				}else{
-					[mapView removeOverlay:o];
-				}
-			}
-		}
-		NSLog(@"Overlays %d", array.count);
-		renderer = [[DTMergableRenderer alloc]initWithOverlays:array];
+		renderer = [[DTMergableRenderer alloc]initWithOverlay:circle];
 		renderer.fillColor = [UIColor blueColor];
-			//renderer.alpha = circle.alpha;
+			
 		
 	}
 	
 	return renderer;
 }
-
 
 
 @end

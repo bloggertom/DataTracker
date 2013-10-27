@@ -11,6 +11,9 @@
 #import "DTMapViewDelegate.h"
 #import "Reachability.h"
 #import "DTSpeedTester.h"
+#import "DTMergableCircleOverlay.h"
+#import "DTMMergableOverlay.h"
+#import "DTAppDelegate.h"
 
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 1
@@ -49,6 +52,10 @@
 	_mapview.showsUserLocation = YES;
 	
 	
+		//Load Preivous overlays
+#if !DEBUG_OVERLAYS
+	[self loadOverlays];
+#endif
 		//set up location manager
 	_locationDelegate = [[DTLocationDelegate alloc]init];
 	_locationManager = [[CLLocationManager alloc]init];
@@ -82,6 +89,31 @@
 	
 }
 
+-(void)loadOverlays{
+		//get all saved overlays
+	DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+	NSManagedObjectContext *context = delegate.managedObjectContext;
+	NSEntityDescription *overlayDescritptions = [NSEntityDescription entityForName:@"MergableOverlay" inManagedObjectContext:context];
+	NSFetchRequest *request = [[NSFetchRequest alloc]init];
+	[request setEntity:overlayDescritptions];
+	NSError *error = nil;
+	NSArray *overlays = [context executeFetchRequest:request error:&error];
+		//convert them to MKOverlays and added them to mapview
+	if (overlays != nil && overlays.count > 0) {
+		for (DTMMergableOverlay *mOverlay in overlays) {
+			DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:CLLocationCoordinate2DMake(mOverlay.latitude.doubleValue, mOverlay.longitude.doubleValue) radius:mOverlay.radius.doubleValue];
+			circle.alpha = mOverlay.alpha.doubleValue;
+			[_mapview addOverlay:circle level:MKOverlayLevelAboveRoads];
+		}
+		NSLog(@"%d Overlays loaded", overlays.count);
+	}else if(error != nil){
+		NSLog(@"Failed to load saved overlays: %@", [error localizedDescription]);
+	}else{
+		NSLog(@"No overlays loaded");
+	}
+
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -107,20 +139,20 @@
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
 		[self speedTesterDidFinishSpeedTestWithResult:10];
 	});
-	/*
+	
 	delayInSeconds = 4.0;
 	popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
 		MKMapPoint point = MKMapPointForCoordinate(_currentLocation.coordinate);
 		CLLocationDistance distancePerPoint = MKMetersPerMapPointAtLatitude(_currentLocation.coordinate.latitude);
-		double deltaPoint = 100/distancePerPoint;
+		double deltaPoint = 300/distancePerPoint;
 		point.x +=deltaPoint;
 		CLLocationCoordinate2D new = MKCoordinateForMapPoint(point);
 		CLLocation *newLocation = [[CLLocation alloc]initWithLatitude:new.latitude longitude: new.longitude];
 		_currentLocation = newLocation;
 		[self speedTesterDidFinishSpeedTestWithResult:10];
 	});
-	*/
+	
 #endif
 }
 
@@ -181,8 +213,54 @@
 	} completion:nil];
 }
 
--(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
-	NSLog(@"Called");
-	return nil;
+
+-(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay{
+	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
+		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
+		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+		NSManagedObjectContext *context = delegate.managedObjectContext;
+		
+		DTMMergableOverlay *overlayM = [NSEntityDescription insertNewObjectForEntityForName:@"MergableOverlay" inManagedObjectContext:context];
+		overlayM.longitude = [NSNumber numberWithDouble:[circle coordinate].longitude];
+		overlayM.latitude = [NSNumber numberWithDouble:[circle coordinate].latitude];
+		overlayM.radius = [NSNumber numberWithDouble:circle.radius];
+		overlayM.alpha = [NSNumber numberWithDouble:circle.alpha];
+		NSError *error;
+		if(![context save:&error]){
+			NSLog(@"Failed to save context: %@", [error localizedDescription]);
+			NSLog(@"%@", [overlayM debugDescription]);
+		}
+	}
+	
+	
+	
+	
+}
+-(void)mapViewDelegateDidRemoveOverlay:(id<MKOverlay>)overlay{
+	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
+		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+		NSManagedObjectContext *context = delegate.managedObjectContext;
+		
+		NSFetchRequest *request = [[NSFetchRequest alloc]init];
+		NSNumber *longitude = [NSNumber numberWithDouble:[overlay coordinate].longitude];
+		NSNumber *latitude = [NSNumber numberWithDouble:[overlay coordinate].latitude];
+		NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(longitude == %@) AND (latitude == %@)", longitude, latitude];
+		
+		NSEntityDescription *entity = [NSEntityDescription entityForName:@"MergableOverlay" inManagedObjectContext:context];
+		
+		[request setEntity:entity];
+		[request setPredicate:predicate];
+		
+		NSError *error = nil;
+		NSArray *array = [context executeFetchRequest:request error:&error];
+		
+		if (array != nil) {
+			DTMMergableOverlay *deleteMe = [array firstObject];
+			[context deleteObject:deleteMe];
+		}else{
+			NSLog(@"Failed to delete overlay: %@", [error localizedDescription]);
+		}
+	}
+	
 }
 @end

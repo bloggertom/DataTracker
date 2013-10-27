@@ -12,12 +12,14 @@
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
 @class Reachability;
+@class DTMergableCircleOverlay;
 @interface DTMainViewController : UIViewController <MKMapViewDelegate>
 
 @property (nonatomic, readonly, strong)MKMapView *mapview;
 @property (nonatomic, getter = isTracking)BOOL tracking;
 @property (nonatomic, weak)Reachability *reach;
 @property (nonatomic, strong)UILabel *progressLabel;
+@property (nonatomic, weak)NSManagedObjectContext *objectContext;
 
 -(void)beginTracking;
 -(void)stopTracking;
@@ -25,4 +27,8 @@
 -(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location;
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs;
 -(void)speedTesterProgressDidChange:(int)perProgress;
+
+-(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay;
+-(void)mapViewDelegateDidRemoveOverlay:(id<MKOverlay>)overlay;
+
 @end

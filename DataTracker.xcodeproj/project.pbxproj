@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB7BEA40181D81CA004655B2 /* DTMMergableOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */; };
 		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
 		DBF8C49B18132A73001911C9 /* DTMergableCircleOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */; };
 		DBF8C49E18134454001911C9 /* DTMergableRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49D18134454001911C9 /* DTMergableRenderer.m */; };
@@ -46,6 +47,8 @@
 
 /* Begin PBXFileReference section */
 		DB19321C1807030E000023CD /* DataTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = DataTracker.entitlements; sourceTree = "<group>"; };
+		DB7BEA3E181D81CA004655B2 /* DTMMergableOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMMergableOverlay.h; sourceTree = "<group>"; };
+		DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMMergableOverlay.m; sourceTree = "<group>"; };
 		DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSpeedTester.h; sourceTree = "<group>"; };
 		DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTSpeedTester.m; sourceTree = "<group>"; };
 		DBF8C49918132A73001911C9 /* DTMergableCircleOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMergableCircleOverlay.h; sourceTree = "<group>"; };
@@ -112,6 +115,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DB7BEA3D181CA3B4004655B2 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BEA3E181D81CA004655B2 /* DTMMergableOverlay.h */,
+				DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		DBF984D417FF2E2D00A75DF1 = {
 			isa = PBXGroup;
 			children = (
@@ -158,6 +170,7 @@
 				DBF9851617FF2E3E00A75DF1 /* DTMainViewController.m */,
 				DBF984F717FF2E2D00A75DF1 /* Images.xcassets */,
 				DBF984F417FF2E2D00A75DF1 /* DataTracker.xcdatamodeld */,
+				DB7BEA3D181CA3B4004655B2 /* Model */,
 				DBF984E917FF2E2D00A75DF1 /* Supporting Files */,
 				DBF9851A17FF2EC200A75DF1 /* DTMapViewDelegate.h */,
 				DBF9851B17FF2EC200A75DF1 /* DTMapViewDelegate.m */,
@@ -319,6 +332,7 @@
 				DBF984F617FF2E2D00A75DF1 /* DataTracker.xcdatamodeld in Sources */,
 				DBF984EF17FF2E2D00A75DF1 /* main.m in Sources */,
 				DBF9851F17FF300500A75DF1 /* DTLocationDelegate.m in Sources */,
+				DB7BEA40181D81CA004655B2 /* DTMMergableOverlay.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
