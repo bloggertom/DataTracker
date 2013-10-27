@@ -13,13 +13,8 @@ result.
 
 ##To do
 
-To manage overlays a subclass of MKOverlayPathRenderer and a 
-DTMergableCircleOverlay class following the MKOverlay protocol were created.
-These could be better. I would be great to get overlapping overlays merged.
-
 This app currently only supports 3G speeds ~ 10-15Mbs
 
-CoreData also needs implamenting but is awayting MKOverlays to be
-finished.
+Add anitation to overlays to see the resulting speed when tapped
 
 Created for iOS 7.
