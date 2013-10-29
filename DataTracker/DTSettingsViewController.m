@@ -61,18 +61,57 @@
 		[self.view addSubview:fGSwitch];
 		[self.view addSubview:fGLabel];
 	}
+	
+	[self setUpSegmentControl];
 }
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+-(void)setUpSegmentControl{
+	NSArray *array = @[@"Map", @"Hybrid", @"Satlite"];
+	UISegmentedControl *segmentControl = [[UISegmentedControl alloc]initWithItems:array];
+	if (!segmentControl) {
+		NSLog(@"Nil segmentControll");
+	}
+	segmentControl.frame = CGRectMake((self.view.bounds.size.width/2) - (segmentControl.bounds.size.width/2), self.view.bounds.size.height - segmentControl.bounds.size.height - 30, segmentControl.bounds.size.width, segmentControl.bounds.size.height);
+	
+	segmentControl.bounds = CGRectMake(0,0,segmentControl.bounds.size.width + 50, segmentControl.bounds.size.height +20);
+	[segmentControl addTarget:self action:@selector(segmentControlChanged:) forControlEvents:UIControlEventValueChanged];
+	
+	switch ([[NSUserDefaults standardUserDefaults]integerForKey:kMapType]) {
+		case MKMapTypeStandard:
+			segmentControl.selectedSegmentIndex = 0;
+			break;
+		case MKMapTypeHybrid:
+			segmentControl.selectedSegmentIndex = 1;
+			break;
+		case MKMapTypeSatellite:
+			segmentControl.selectedSegmentIndex = 2;
+			break;
+		default:
+			break;
+	}
+	
+	[self.view addSubview:segmentControl];
+}
+
 -(void)switchValueChanged:(id)sender{
 	if ([sender isKindOfClass:[UISwitch class]]) {
 		UISwitch *fgSwitch = (UISwitch *)sender;
 		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 		[defaults setBool:fgSwitch.on forKey:kDataType4G];
 		[self.callBack switchValueDidChanged:fgSwitch.on];
+	}
+}
+
+-(void)segmentControlChanged:(id)sender{
+	if ([sender isKindOfClass:[UISegmentedControl class]]) {
+		UISegmentedControl *control = (UISegmentedControl*)sender;
+		
+		[self.callBack segmentControlValueDidChange:control.selectedSegmentIndex];
 	}
 }
 @end

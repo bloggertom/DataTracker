@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 #define kDataType4G @"4Gdata"
+#define kMapType @"UserMapType"
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
 @class Reachability;
@@ -37,4 +38,5 @@
 
 
 -(void)switchValueDidChanged:(BOOL)on;
+-(void)segmentControlValueDidChange:(NSInteger)index;
 @end

@@ -60,7 +60,7 @@
 	_mapViewDelegate.callback = self;
 	_mapview.delegate = _mapViewDelegate;
 	_mapview.showsUserLocation = YES;
-	
+	_mapview.mapType = [[NSUserDefaults standardUserDefaults]integerForKey:kMapType];
 	
 		//Load Preivous overlays
 #if !DEBUG_OVERLAYS
@@ -322,7 +322,7 @@
 #endif
 }
 
-#pragma mark - switch handler
+#pragma mark - settings cotroller handlers
 
 -(void)switchValueDidChanged:(BOOL)on{
 	[self correctMaxSpeed];
@@ -340,6 +340,25 @@
 		_MaxSpeed = DefaultSpeed;
 	}
 	NSLog(@"Max Speed %d", _MaxSpeed);
+}
+
+-(void)segmentControlValueDidChange:(NSInteger)index{
+	switch (index) {
+		case 0:
+			self.mapview.mapType = MKMapTypeStandard;
+			[[NSUserDefaults standardUserDefaults]setInteger:MKMapTypeStandard forKey:kMapType];
+			break;
+		case 1:
+			self.mapview.mapType = MKMapTypeHybrid;
+			[[NSUserDefaults standardUserDefaults]setInteger:MKMapTypeHybrid forKey:kMapType];
+			break;
+		case 2:
+			self.mapview.mapType = MKMapTypeSatellite;
+			[[NSUserDefaults standardUserDefaults]setInteger:MKMapTypeSatellite forKey:kMapType];
+			break;
+		default:
+			break;
+	}
 }
 -(void)presentSettings{
 	DTSettingsViewController *settingsViewController = [[DTSettingsViewController alloc]init];
