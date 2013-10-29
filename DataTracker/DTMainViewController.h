@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
-
+#define kDataType4G @"4Gdata"
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
 @class Reachability;
@@ -21,6 +21,10 @@
 @property (nonatomic, strong)UILabel *progressLabel;
 @property (nonatomic, weak)NSManagedObjectContext *objectContext;
 
+
++(BOOL)FourGEnabledModel;
++(NSString *)getModel;
+
 -(void)beginTracking;
 -(void)stopTracking;
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success;
@@ -31,4 +35,6 @@
 -(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay;
 -(void)mapViewDelegateDidRemoveOverlay:(id<MKOverlay>)overlay;
 
+
+-(void)switchValueDidChanged:(BOOL)on;
 @end

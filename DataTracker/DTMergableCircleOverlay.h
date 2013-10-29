@@ -15,7 +15,9 @@
 @property (nonatomic, readonly)CLLocationDistance radius;
 @property (nonatomic, readonly)CLLocationCoordinate2D coordinate;
 @property (nonatomic, readonly)MKMapRect boundingMapRect;
-
+@property (nonatomic, strong)UIColor *color;
+@property (nonatomic, copy)NSString *title;
+@property (nonatomic, copy)NSString *subTitle;
 
 +(DTMergableCircleOverlay*)circleWithCenterCoordinate:(CLLocationCoordinate2D)coord radius:(CLLocationDistance)radius;
 

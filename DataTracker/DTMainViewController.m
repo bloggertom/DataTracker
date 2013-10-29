@@ -14,10 +14,17 @@
 #import "DTMergableCircleOverlay.h"
 #import "DTMMergableOverlay.h"
 #import "DTAppDelegate.h"
-
+#import "DTSettingsViewController.h"
+#include <sys/sysctl.h>
+	//White Box Test cases
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 1
-#define MaxSpeed 10
+#define LTE_TEST 1
+
+#define DefaultSpeed 10
+#define HSPAPlusSpeed 20
+#define FourGSpeed 50
+
 #define MinSpeed 0
 @interface DTMainViewController ()
 @property (nonatomic, strong)DTMapViewDelegate *mapViewDelegate;
@@ -25,6 +32,7 @@
 @property (nonatomic, strong)CLLocationManager *locationManager;
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property(nonatomic, strong)CLLocation *currentLocation;
+@property (nonatomic)NSInteger MaxSpeed;
 
 @end
 
@@ -43,7 +51,9 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-		
+	[self correctMaxSpeed];
+	
+	
 		//set up map view
 	_mapview = [[MKMapView alloc]initWithFrame:self.view.bounds];
 	_mapViewDelegate = [[DTMapViewDelegate alloc]init];
@@ -81,11 +91,21 @@
 	[self.view addSubview:_mapview];
 	[self setUpUI];
 }
-
+#pragma mark - set up methods
 -(void)setUpUI{
+	
+		//add progress label
 	_progressLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 200, 50)];
 	_progressLabel.alpha = 0;
 	[self.view addSubview:_progressLabel];
+
+		//add settings button
+	UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+	settingsButton.frame = CGRectMake(self.view.bounds.size.width-70, self.view.bounds.size.height-70, 80, 80);
+	[settingsButton addTarget:self action:@selector(presentSettings) forControlEvents:UIControlEventTouchUpInside];
+
+	[self.view addSubview:settingsButton];
+	
 	
 }
 
@@ -103,9 +123,12 @@
 		for (DTMMergableOverlay *mOverlay in overlays) {
 			DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:CLLocationCoordinate2DMake(mOverlay.latitude.doubleValue, mOverlay.longitude.doubleValue) radius:mOverlay.radius.doubleValue];
 			circle.alpha = mOverlay.alpha.doubleValue;
+			circle.title = mOverlay.title;
+			circle.color = [NSKeyedUnarchiver unarchiveObjectWithData:mOverlay.color];
 			[_mapview addOverlay:circle level:MKOverlayLevelAboveRoads];
+			[_mapview addAnnotation:circle];
 		}
-		NSLog(@"%d Overlays loaded", overlays.count);
+		NSLog(@"%lu Overlays loaded", (unsigned long)overlays.count);
 	}else if(error != nil){
 		NSLog(@"Failed to load saved overlays: %@", [error localizedDescription]);
 	}else{
@@ -118,6 +141,24 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
++(NSString *)getModel {
+    size_t size;
+    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+    char *model = malloc(size);
+    sysctlbyname("hw.machine", model, &size, NULL, 0);
+    NSString *deviceModel = [NSString stringWithCString:model encoding:NSUTF8StringEncoding];
+    free(model);
+    return deviceModel;
+}
+
++(BOOL)FourGEnabledModel{
+	NSString *model = [DTMainViewController getModel];
+#if LTE_TEST
+	return TRUE;
+#else
+	return ([model rangeOfString:@"iPhone5"].location != NSNotFound || [model rangeOfString:@"iPhone6"].location != NSNotFound);
+#endif
 }
 #pragma mark - Tracking
 - (void)stopTracking{
@@ -187,7 +228,7 @@
 		double delayInSeconds = 2.0;
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform(10)+1];
+			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform(_MaxSpeed)+1];
 		});
 #endif
 	}];
@@ -202,20 +243,32 @@
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
 	NSLog(@"Finished with Mbs %f",Mbs);
 		//y = 1 + (x-A)*(0.7-0)/(B-A), RANGE A-B
-	double alpha = Mbs * 0.8 / MaxSpeed;
+	double alpha = Mbs * 0.8 / _MaxSpeed;
 	
 	CLLocation *location = [_currentLocation copy];
 	
-	[self.mapViewDelegate addOverlayWithAlpha:alpha atLocation:location toMapView:_mapview];
+	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
+	circle.alpha = alpha;
+	circle.title = [NSString stringWithFormat:@"%1.1f Mbs",Mbs];
+	if ([[NSUserDefaults standardUserDefaults]boolForKey:kDataType4G]) {
+		circle.color = [UIColor greenColor];
+	}else{
+		circle.color = [UIColor blueColor];
+	}
 	
-	[UIView animateWithDuration:2 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
+	
+	[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 		self.progressLabel.alpha = 0;
 	} completion:nil];
 }
 
-
+#pragma mark - call back methods from map view delegate
 -(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay{
+#if !DEBUG_OVERLAYS
+		//check overlay was mergable circle
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
+			//if so update model context
 		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
 		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
@@ -225,6 +278,8 @@
 		overlayM.latitude = [NSNumber numberWithDouble:[circle coordinate].latitude];
 		overlayM.radius = [NSNumber numberWithDouble:circle.radius];
 		overlayM.alpha = [NSNumber numberWithDouble:circle.alpha];
+		overlayM.title = circle.title;
+		overlayM.color = [NSKeyedArchiver archivedDataWithRootObject:circle.color];
 		NSError *error;
 		if(![context save:&error]){
 			NSLog(@"Failed to save context: %@", [error localizedDescription]);
@@ -232,12 +287,15 @@
 		}
 	}
 	
-	
+#endif
 	
 	
 }
 -(void)mapViewDelegateDidRemoveOverlay:(id<MKOverlay>)overlay{
+#if	!DEBUG_OVERLAYS
+		//check overlay was a Mergable circle
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
+			//if so update model context
 		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
 		
@@ -261,6 +319,32 @@
 			NSLog(@"Failed to delete overlay: %@", [error localizedDescription]);
 		}
 	}
-	
+#endif
+}
+
+#pragma mark - switch handler
+
+-(void)switchValueDidChanged:(BOOL)on{
+	[self correctMaxSpeed];
+}
+-(void)correctMaxSpeed{
+		//NSString *model = [DTMainViewController getModel];
+	if ([DTMainViewController FourGEnabledModel]) {
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		if ([defaults boolForKey:kDataType4G]) {
+			_MaxSpeed = FourGSpeed;
+		}else{
+			_MaxSpeed = HSPAPlusSpeed;
+		}
+	}else{
+		_MaxSpeed = DefaultSpeed;
+	}
+	NSLog(@"Max Speed %d", _MaxSpeed);
+}
+-(void)presentSettings{
+	DTSettingsViewController *settingsViewController = [[DTSettingsViewController alloc]init];
+	settingsViewController.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+	settingsViewController.callBack = self;
+	[self presentViewController:settingsViewController animated:YES completion:nil];
 }
 @end

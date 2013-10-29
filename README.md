@@ -2,7 +2,7 @@
 
 An application which recored at different locations the speed of 
 the iphones data connection and places an overlay on a MKMapView
-of varying alphas to indicate the resulting speed.
+of varying alphas along with an annotation to indicate the resulting speed.
 
 So far there is no reliable way to find out the iphones current data
 connection type(3G/GPRS/EDGE/CDMA) progmatically. Therefore  a 
@@ -13,8 +13,7 @@ result.
 
 ##To do
 
-This app currently only supports 3G speeds ~ 10-15Mbs
+Make pin annotation appear when map is zoomed out
 
-Add anitation to overlays to see the resulting speed when tapped
 
 Created for iOS 7.

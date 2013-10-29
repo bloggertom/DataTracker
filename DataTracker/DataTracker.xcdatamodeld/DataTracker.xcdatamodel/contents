@@ -2,11 +2,13 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3400" systemVersion="13A603" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="MergableOverlay" representedClassName="DTMMergableOverlay" syncable="YES">
         <attribute name="alpha" attributeType="Double" minValueString="0" maxValueString="1" defaultValueString="0" syncable="YES"/>
-        <attribute name="latitude" attributeType="Double" defaultValueString="0.0" indexed="YES" syncable="YES"/>
+        <attribute name="color" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="latitude" attributeType="Double" minValueString="0" defaultValueString="0.0" indexed="YES" syncable="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" indexed="YES" syncable="YES"/>
         <attribute name="radius" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="MergableOverlay" positionX="160" positionY="192" width="128" height="103"/>
+        <element name="MergableOverlay" positionX="-144" positionY="192" width="128" height="133"/>
     </elements>
 </model>

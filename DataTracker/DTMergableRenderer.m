@@ -54,7 +54,7 @@
 		
 		CGRect rect = [self rectForMapRect:o.boundingMapRect];
 		
-		NSArray *array = [NSArray arrayWithObjects:(id)[self.fillColor colorWithAlphaComponent:o.alpha].CGColor,[self.fillColor colorWithAlphaComponent:0.0].CGColor, nil];
+		NSArray *array = [NSArray arrayWithObjects:(id)[o.color colorWithAlphaComponent:o.alpha].CGColor,[o.color colorWithAlphaComponent:0.0].CGColor, nil];
 		
 		CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
 		CGFloat radius = rect.size.width * 0.5;
@@ -65,6 +65,8 @@
 		
 	}
 		//NSArray *array = [NSArray arrayWithObjects:(id)[self.fillColor colorWithAlphaComponent:tOverlay.alpha].CGColor,[UIColor clearColor].CGColor, nil];
+	
+	
 	
 	
 		//CFRelease(colorsArr);

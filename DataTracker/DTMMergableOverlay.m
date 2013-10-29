@@ -15,5 +15,6 @@
 @dynamic latitude;
 @dynamic longitude;
 @dynamic radius;
-
+@dynamic title;
+@dynamic color;
 @end
