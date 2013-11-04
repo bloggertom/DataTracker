@@ -8,9 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+#define USE_ICLOUD 1
+
 @class DTMainViewController;
 @class Reachability;
-@interface DTAppDelegate : UIResponder <UIApplicationDelegate>
+
+static NSString * const DTDataStorageICloud = @"iCloud";
+static NSString * const DTDataStorageLocal = @"Local";
+
+@interface DTAppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

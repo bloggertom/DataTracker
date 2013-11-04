@@ -61,11 +61,7 @@
 	_mapview.delegate = _mapViewDelegate;
 	_mapview.showsUserLocation = YES;
 	_mapview.mapType = [[NSUserDefaults standardUserDefaults]integerForKey:kMapType];
-	
-		//Load Preivous overlays
-#if !DEBUG_OVERLAYS
-	[self loadOverlays];
-#endif
+
 		//set up location manager
 	_locationDelegate = [[DTLocationDelegate alloc]init];
 	_locationManager = [[CLLocationManager alloc]init];
@@ -74,10 +70,7 @@
 #endif
 	_locationManager.delegate = _locationDelegate;
 	_locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-	_locationManager.pausesLocationUpdatesAutomatically = YES;
-	
-		//centering map view
-	
+	_locationManager.pausesLocationUpdatesAutomatically = NO;
 	
 		//track user location. May not be needed?
 		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
@@ -87,10 +80,36 @@
 	_speedTester = [[DTSpeedTester alloc]init];
 	_speedTester.callback = self;
 	
-	
-	[self.view addSubview:_mapview];
 	[self setUpUI];
+	[self.view addSubview:_mapview];
+	
 }
+
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+		// Dispose of any resources that can be recreated.
+}
++(NSString *)getModel {
+    size_t size;
+    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+    char *model = malloc(size);
+    sysctlbyname("hw.machine", model, &size, NULL, 0);
+    NSString *deviceModel = [NSString stringWithCString:model encoding:NSUTF8StringEncoding];
+    free(model);
+    return deviceModel;
+}
+
++(BOOL)FourGEnabledModel{
+#if LTE_TEST
+	return TRUE;
+#else
+	NSString *model = [DTMainViewController getModel];
+	return ([model rangeOfString:@"iPhone5"].location != NSNotFound || [model rangeOfString:@"iPhone6"].location != NSNotFound);
+#endif
+}
+
 #pragma mark - set up methods
 -(void)setUpUI{
 	
@@ -111,7 +130,7 @@
 
 -(void)loadOverlays{
 		//get all saved overlays
-	DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+	DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 	NSManagedObjectContext *context = delegate.managedObjectContext;
 	NSEntityDescription *overlayDescritptions = [NSEntityDescription entityForName:@"MergableOverlay" inManagedObjectContext:context];
 	NSFetchRequest *request = [[NSFetchRequest alloc]init];
@@ -137,29 +156,16 @@
 
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - iCloud
+-(void)dataStoreDidUpdateFromUbiquityContainer{
+	NSLog(@"update for container");
+	[self updateUi];
 }
-+(NSString *)getModel {
-    size_t size;
-    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
-    char *model = malloc(size);
-    sysctlbyname("hw.machine", model, &size, NULL, 0);
-    NSString *deviceModel = [NSString stringWithCString:model encoding:NSUTF8StringEncoding];
-    free(model);
-    return deviceModel;
+-(void)updateUi{
+	[self.mapview removeOverlays:self.mapview.overlays];
+	[self loadOverlays];
 }
 
-+(BOOL)FourGEnabledModel{
-	NSString *model = [DTMainViewController getModel];
-#if LTE_TEST
-	return TRUE;
-#else
-	return ([model rangeOfString:@"iPhone5"].location != NSNotFound || [model rangeOfString:@"iPhone6"].location != NSNotFound);
-#endif
-}
 #pragma mark - Tracking
 - (void)stopTracking{
 	NSLog(@"Tracking stopped");
@@ -169,7 +175,7 @@
 
 -(void)beginTracking{
 	NSLog(@"Tracking");
-	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 500, 500)animated:YES];
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
 	[self.locationManager startMonitoringSignificantLocationChanges];
 	self.tracking = YES;
 	
@@ -201,14 +207,10 @@
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success{
 	[self.reach startNotifier];
 	NSLog(@"Moo");
-	if(self.reach.isReachableViaWWAN){
-		double delayInSeconds = 2.0;
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-				[self beginTracking];
-		});
-		
+	if ([[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
+		[self loadOverlays];
 	}
+	
 }
 
 #pragma mark - Overlay addition
@@ -247,7 +249,7 @@
 	
 	CLLocation *location = [_currentLocation copy];
 	
-	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
+	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:500];
 	circle.alpha = alpha;
 	circle.title = [NSString stringWithFormat:@"%1.1f Mbs",Mbs];
 	if ([[NSUserDefaults standardUserDefaults]boolForKey:kDataType4G]) {
@@ -270,7 +272,7 @@
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
 			//if so update model context
 		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
-		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+		DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
 		
 		DTMMergableOverlay *overlayM = [NSEntityDescription insertNewObjectForEntityForName:@"MergableOverlay" inManagedObjectContext:context];
@@ -296,7 +298,7 @@
 		//check overlay was a Mergable circle
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
 			//if so update model context
-		DTAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+		DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
 		
 		NSFetchRequest *request = [[NSFetchRequest alloc]init];

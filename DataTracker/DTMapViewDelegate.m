@@ -13,7 +13,7 @@
 #import "DTMergableRenderer.h"
 
 #define   DEGREES_TO_RADIANS(degrees)  ((M_PI * degrees)/ 180)
-#define kMIN_DISTANCE 250
+#define kMIN_DISTANCE 550
 @interface DTMapViewDelegate ()
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property (nonatomic)BOOL inicialRender;
