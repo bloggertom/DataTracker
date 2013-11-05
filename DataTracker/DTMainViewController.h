@@ -26,8 +26,6 @@
 +(BOOL)FourGEnabledModel;
 +(NSString *)getModel;
 
--(void)dataStoreDidUpdateFromUbiquityContainer;
-
 -(void)beginTracking;
 -(void)stopTracking;
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success;

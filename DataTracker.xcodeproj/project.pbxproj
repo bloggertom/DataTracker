@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB2D2DCF1827EC6B00F8BD96 /* DTiPadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB2D2DCE1827EC6B00F8BD96 /* DTiPadViewController.m */; };
 		DB7BEA40181D81CA004655B2 /* DTMMergableOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */; };
 		DB7BEA43181F3EE5004655B2 /* DTSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */; };
 		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
@@ -48,6 +49,9 @@
 
 /* Begin PBXFileReference section */
 		DB19321C1807030E000023CD /* DataTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = DataTracker.entitlements; sourceTree = "<group>"; };
+		DB2D2DCD1827EC6B00F8BD96 /* DTiPadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTiPadViewController.h; sourceTree = "<group>"; };
+		DB2D2DCE1827EC6B00F8BD96 /* DTiPadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTiPadViewController.m; sourceTree = "<group>"; };
+		DB2D2DD01827FEFF00F8BD96 /* DTViewPersistanceDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DTViewPersistanceDelegate.h; sourceTree = "<group>"; };
 		DB7BEA3E181D81CA004655B2 /* DTMMergableOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMMergableOverlay.h; sourceTree = "<group>"; };
 		DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMMergableOverlay.m; sourceTree = "<group>"; };
 		DB7BEA41181F3EE5004655B2 /* DTSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSettingsViewController.h; sourceTree = "<group>"; };
@@ -171,6 +175,8 @@
 				DBF984F217FF2E2D00A75DF1 /* DTAppDelegate.m */,
 				DBF9851517FF2E3E00A75DF1 /* DTMainViewController.h */,
 				DBF9851617FF2E3E00A75DF1 /* DTMainViewController.m */,
+				DB2D2DCD1827EC6B00F8BD96 /* DTiPadViewController.h */,
+				DB2D2DCE1827EC6B00F8BD96 /* DTiPadViewController.m */,
 				DB7BEA41181F3EE5004655B2 /* DTSettingsViewController.h */,
 				DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */,
 				DBF984F717FF2E2D00A75DF1 /* Images.xcassets */,
@@ -187,6 +193,7 @@
 				DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */,
 				DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */,
 				DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */,
+				DB2D2DD01827FEFF00F8BD96 /* DTViewPersistanceDelegate.h */,
 			);
 			path = DataTracker;
 			sourceTree = "<group>";
@@ -333,6 +340,7 @@
 				DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */,
 				DBF9851C17FF2EC200A75DF1 /* DTMapViewDelegate.m in Sources */,
 				DBF8C49E18134454001911C9 /* DTMergableRenderer.m in Sources */,
+				DB2D2DCF1827EC6B00F8BD96 /* DTiPadViewController.m in Sources */,
 				DBF9852817FF4A3200A75DF1 /* Reachability.m in Sources */,
 				DBF984F617FF2E2D00A75DF1 /* DataTracker.xcdatamodeld in Sources */,
 				DBF984EF17FF2E2D00A75DF1 /* main.m in Sources */,
@@ -463,8 +471,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DataTracker/DataTracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/DataTracker-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -480,8 +490,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DataTracker/DataTracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/DataTracker-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

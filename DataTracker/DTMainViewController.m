@@ -61,12 +61,16 @@
 	_mapview.delegate = _mapViewDelegate;
 	_mapview.showsUserLocation = YES;
 	_mapview.mapType = [[NSUserDefaults standardUserDefaults]integerForKey:kMapType];
-
+	
+	
 		//set up location manager
 	_locationDelegate = [[DTLocationDelegate alloc]init];
 	_locationManager = [[CLLocationManager alloc]init];
 #if !DEBUG_OVERLAYS
-	_locationDelegate.callback = self;
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+		_locationDelegate.callback = self;
+	}
+	
 #endif
 	_locationManager.delegate = _locationDelegate;
 	_locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -83,8 +87,17 @@
 	[self setUpUI];
 	[self.view addSubview:_mapview];
 	
+		//if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] isEqualToString:DTDataStorageICloud]) {
+	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUi) name:NSPersistentStoreCoordinatorStoresDidChangeNotification object:nil];
+	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUi) name:NSPersistentStoreDidImportUbiquitousContentChangesNotification object:nil];
+		//}
+	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadOverlays) name:UserChoseStorageTypeNotification object:nil];
+	
 }
 
+-(void)dealloc{
+	[[NSNotificationCenter defaultCenter]removeObserver:self];
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -157,13 +170,20 @@
 }
 
 #pragma mark - iCloud
--(void)dataStoreDidUpdateFromUbiquityContainer{
+/*
+-(void)dataStoreDidUpdateFromUbiquityContainer:(NSNotification *)notification{
 	NSLog(@"update for container");
+	DTAppDelegate *delegate = (DTAppDelegate *)[[UIApplication sharedApplication]delegate];
+	[delegate.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
 	[self updateUi];
 }
+ */
 -(void)updateUi{
-	[self.mapview removeOverlays:self.mapview.overlays];
-	[self loadOverlays];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.mapview removeOverlays:self.mapview.overlays];
+		[self loadOverlays];
+	});
+	
 }
 
 #pragma mark - Tracking
@@ -208,7 +228,7 @@
 	[self.reach startNotifier];
 	NSLog(@"Moo");
 	if ([[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
-		[self loadOverlays];
+			[self loadOverlays];
 	}
 	
 }
@@ -341,7 +361,7 @@
 	}else{
 		_MaxSpeed = DefaultSpeed;
 	}
-	NSLog(@"Max Speed %d", _MaxSpeed);
+	NSLog(@"Max Speed %ld", (long)_MaxSpeed);
 }
 
 -(void)segmentControlValueDidChange:(NSInteger)index{

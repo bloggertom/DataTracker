@@ -9,7 +9,7 @@
 #import "DTAppDelegate.h"
 #import "DTMainViewController.h"
 #import "Reachability.h"
-
+#import "DTiPadViewController.h"
 #define DEBUG_ALERTVIEW 0
 
 
@@ -47,19 +47,26 @@
 	}else{
 		[self userHasMadeStorageChoice];
 	}
-	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(iCloudAvailabilityChange) name:NSUbiquityIdentityDidChangeNotification object:nil];
+		//[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(iCloudAvailabilityChange) name:NSUbiquityIdentityDidChangeNotification object:nil];
 #endif
-	
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		
+		_mainIPadController = [[DTiPadViewController alloc]init];
+		self.window.rootViewController = _mainIPadController;
+	}else{
 		//check reachability
-	_reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
-	_reachability.reachableOnWWAN = YES;
-	
-	
-	
-    _mainController = [[DTMainViewController alloc]init];
-	_mainController.reach = _reachability;
-	self.window.rootViewController = _mainController;
-	
+		_reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
+		_reachability.reachableOnWWAN = YES;
+		_mainIPhoneController = [[DTMainViewController alloc]init];
+		_mainIPhoneController.reach = _reachability;
+		self.window.rootViewController = _mainIPhoneController;
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(reachabilityChanged:)
+													 name:kReachabilityChangedNotification
+												   object:nil];
+		
+		[self reachabilityChanged:nil];
+	}
     [self.window makeKeyAndVisible];
 
 	
@@ -106,10 +113,10 @@
 
 -(void)reachabilityChanged:(NSNotification *)notification{
 	NSLog(@"Reachability Changed");
-	if (_reachability.isReachableViaWWAN) {
-		[_mainController beginTracking];
+	if (_reachability.isReachableViaWWAN && [[NSUserDefaults standardUserDefaults] objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
+		[_mainIPhoneController beginTracking];
 	}else{
-		[_mainController stopTracking];
+		[_mainIPhoneController stopTracking];
 	}
 }
 
@@ -139,8 +146,9 @@
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     if (coordinator != nil) {
-        _managedObjectContext = [[NSManagedObjectContext alloc] init];
-        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+        _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+		[_managedObjectContext setPersistentStoreCoordinator:coordinator];
+        
     }
     return _managedObjectContext;
 }
@@ -166,46 +174,81 @@
     if (_persistentStoreCoordinator != nil) {
         return _persistentStoreCoordinator;
     }
-    
-    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"DataTracker.sqlite"];
-	
-	NSDictionary *options = nil;
-	
-	if([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"]isEqualToString: DTDataStorageICloud]){
-		options = [[NSDictionary alloc]initWithObjectsAndKeys:@"DataTracker_iCloud_Store",NSPersistentStoreUbiquitousContentNameKey, nil];
-		NSLog(@"Set up options for ubiquity container");
-	}
-    
-    NSError *error = nil;
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
-        /*
-         Replace this implementation with code to handle the error appropriately.
-         
-         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-         
-         Typical reasons for an error here include:
-         * The persistent store is not accessible;
-         * The schema for the persistent store is incompatible with current managed object model.
-         Check the error message to determine what the actual problem was.
-         
-         
-         If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
-         
-         If you encounter schema incompatibility errors during development, you can reduce their frequency by:
-         * Simply deleting the existing store:
-         [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
-         
-         * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
-         @{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
-         
-         Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
-         
-         */
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }    
-    
+	
+		//dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+		NSError *error = nil;
+		NSString *storeName = @"DataTracker.sqlite";
+			//NSString *icloudStoreDirectory = @"Data.nosync";
+			//NSString *icloudLogDirectory = @"Logs";
+		NSURL *localStoreURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:storeName];
+		NSMutableDictionary *options = [[NSMutableDictionary alloc]init];
+			//NSFileManager *fileManager = [NSFileManager defaultManager];
+		
+		if([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"]isEqualToString: DTDataStorageICloud]){
+			/*
+			NSURL *iCloud = [fileManager URLForUbiquityContainerIdentifier:nil];
+			NSURL *logsPath = [iCloud URLByAppendingPathComponent:icloudLogDirectory isDirectory:YES];
+			NSURL *dataPath = [iCloud URLByAppendingPathComponent:icloudStoreDirectory isDirectory:YES];
+			
+			if ([fileManager fileExistsAtPath:dataPath.path] != YES) {
+				NSError *fileError = nil;
+				
+				[fileManager createDirectoryAtPath:dataPath.path withIntermediateDirectories:YES attributes:nil error:&fileError];
+				if (fileError) {
+					NSLog(@"Error Creating Ubiquitous data store: %@", fileError);
+				}
+			}
+			*/
+			
+			[options setObject:@"DataTracker_iCloud_Store" forKey:NSPersistentStoreUbiquitousContentNameKey];
+			[options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
+            [options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
+				//[options setObject:logsPath                forKey:NSPersistentStoreUbiquitousContentURLKey];
+			
+			[_persistentStoreCoordinator lock];
+			
+			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:options error:&error];
+			
+			[_persistentStoreCoordinator unlock];
+			
+		}else{
+			[_persistentStoreCoordinator lock];
+			
+			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:nil error:&error];
+			
+			[_persistentStoreCoordinator unlock];
+		}
+		if (error != nil) {
+			/*
+			 Replace this implementation with code to handle the error appropriately.
+			 
+			 abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+			 
+			 Typical reasons for an error here include:
+			 * The persistent store is not accessible;
+			 * The schema for the persistent store is incompatible with current managed object model.
+			 Check the error message to determine what the actual problem was.
+			 
+			 
+			 If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
+			 
+			 If you encounter schema incompatibility errors during development, you can reduce their frequency by:
+			 * Simply deleting the existing store:
+			 [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
+			 
+			 * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
+			 @{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
+			 
+			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
+			 
+			 */
+			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+			abort();
+		}
+
+		//});
+	   
     return _persistentStoreCoordinator;
 }
 
@@ -240,11 +283,6 @@
 		NSLog(@"User Chose to use iCloud Storage");
 		[[NSUserDefaults standardUserDefaults]setObject:DTDataStorageICloud forKey:@"com.apple.DataTracker.StorageType"];
 		
-		[[NSNotificationCenter defaultCenter]addObserver:_mainController selector:@selector(dataStoreDidUpdateFromUbiquityContainer) name:NSPersistentStoreDidImportUbiquitousContentChangesNotification object:nil];
-		/*dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			[self setUpUbiquityContainer];
-			
-		});*/
 		
 	}else{
 		NSLog(@"Unknown Storage Option chosen");
@@ -253,13 +291,13 @@
 }
 
 -(void)userHasMadeStorageChoice{
-	[[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"com.apple.DataTracker.FirstLaunchWithiCloud"];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(reachabilityChanged:)
-												 name:kReachabilityChangedNotification
-											   object:nil];
-	if (_reachability.reachableOnWWAN) {
-		[_mainController beginTracking];
-	}
+	/*NSLock *lock = [[NSLock alloc]init];
+	[lock lock];
+	_persistentStoreCoordinator = self.persistentStoreCoordinator;
+	[lock unlock];*/
+	NSNotification *notification = [NSNotification notificationWithName:UserChoseStorageTypeNotification object:nil];
+	[[NSNotificationCenter defaultCenter]postNotification:notification];
+	
+	
 }
 @end

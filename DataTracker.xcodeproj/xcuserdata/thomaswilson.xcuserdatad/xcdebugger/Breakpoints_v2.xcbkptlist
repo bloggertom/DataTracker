@@ -41,28 +41,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DataTracker/DTMapViewDelegate.m"
-            timestampString = "404612413.300904"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
-            landmarkName = "@implementation DTMapViewDelegate"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "DataTracker/DTMainViewController.m"
-            timestampString = "405212871.547123"
+            timestampString = "405365832.651241"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "287"
-            endingLineNumber = "287"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
             landmarkName = "-mapViewDelegateDidAddOverlay:"
             landmarkType = "5">
          </BreakpointContent>
@@ -73,13 +57,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DataTracker/DTAppDelegate.m"
-            timestampString = "405218801.711819"
+            filePath = "DataTracker/DTMainViewController.m"
+            timestampString = "405365832.651241"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "174"
-            endingLineNumber = "174"
-            landmarkName = "-persistentStoreCoordinator"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
+            landmarkName = "-loadOverlays"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

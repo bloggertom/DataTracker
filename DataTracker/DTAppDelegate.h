@@ -12,9 +12,11 @@
 
 @class DTMainViewController;
 @class Reachability;
+@class DTiPadViewController;
 
 static NSString * const DTDataStorageICloud = @"iCloud";
 static NSString * const DTDataStorageLocal = @"Local";
+static NSString *const UserChoseStorageTypeNotification = @"StoryTypeChosen";
 
 @interface DTAppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>
 
@@ -23,7 +25,8 @@ static NSString * const DTDataStorageLocal = @"Local";
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (readonly, strong, nonatomic) DTMainViewController *mainController;
+@property (readonly, strong, nonatomic) DTMainViewController *mainIPhoneController;
+@property (readonly, strong, nonatomic) DTiPadViewController *mainIPadController;
 
 @property (nonatomic, strong)Reachability *reachability;
 

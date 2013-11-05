@@ -32,8 +32,9 @@
 }
 -(void)mapViewDidFinishRenderingMap:(MKMapView *)mapView fullyRendered:(BOOL)fullyRendered{
 	if (_inicialRender) {//required for first overlay.
-		
-		[self.callback mapFinishedInitialRenderingSuccessfully:(BOOL)fullyRendered];
+		if (_callback) {
+			[self.callback mapFinishedInitialRenderingSuccessfully:(BOOL)fullyRendered];
+		}
 		_inicialRender = NO;
 	}
 }
@@ -51,43 +52,22 @@
 				if ([location distanceFromLocation:location2] < kMIN_DISTANCE) {
 					[mapView removeOverlay:o];
 					[mapView removeAnnotation:o];
-					[self.callback mapViewDelegateDidRemoveOverlay:o];
+					if (_callback) {
+						[self.callback mapViewDelegateDidRemoveOverlay:o];
+					}
+					
 				}
 			}
 		}
 		[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
 		[mapView addAnnotation:circle];
-		[self.callback mapViewDelegateDidAddOverlay:circle];
-	}
-}
-/*
--(void)addOverlayWithAlpha:(CGFloat)alpha atLocation:(CLLocation*)location toMapView:(MKMapView *)mapView{
-	NSLog(@"Adding overlay with alpha %f",alpha);
-	NSAssert([mapView.delegate isKindOfClass:[self class]], [NSString stringWithFormat:@"Unable to add overlay to map view with invalid delegate"]);
-	mapView.delegate = self;
-		//MKCircle *circle = [MKCircle circleWithCenterCoordinate:location.coordinate radius:200];
-	DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)[DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:200];
-	NSArray *array = [mapView overlaysInLevel:MKOverlayLevelAboveRoads];
-	
-	for (id<MKOverlay> o in array) {
-		if ([o isKindOfClass:[DTMergableCircleOverlay class]]) {
-			DTMergableCircleOverlay *overlay = (DTMergableCircleOverlay*)o;
-			CLLocation *location = [[CLLocation alloc]initWithLatitude:overlay.coordinate.latitude longitude:overlay.coordinate.longitude];
-			CLLocation *location2 = [[CLLocation alloc]initWithLatitude:circle.coordinate.latitude longitude:circle.coordinate.longitude];
-			if ([location distanceFromLocation:location2] < kMIN_DISTANCE) {
-				[mapView removeOverlay:o];
-				[mapView removeAnnotation:o];
-				[self.callback mapViewDelegateDidRemoveOverlay:o];
-			}
+		if (_callback) {
+			[self.callback mapViewDelegateDidAddOverlay:circle];
 		}
+		
 	}
-	
-	
-	circle.alpha = alpha;
-	[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
-	[self.callback mapViewDelegateDidAddOverlay:circle];
 }
-*/
+
 -(MKOverlayRenderer*)mapView:(MKMapView *)mapView rendererForOverlay:(id<MKOverlay>)overlay{
 	NSLog(@"adding overlay");
 		
