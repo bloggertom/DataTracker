@@ -13,6 +13,7 @@
 #import "DTMapViewDelegate.h"
 @interface DTiPadViewController ()
 @property (nonatomic, strong)DTMapViewDelegate *mapDelegate;
+@property (nonatomic, strong)CLLocationManager *locationManager;
 @end
 
 @implementation DTiPadViewController
@@ -35,8 +36,10 @@
 	_mapDelegate = [[DTMapViewDelegate alloc]init];
 		//mapDelegate.callback = self;
 	_mapview.delegate = _mapDelegate;
-	[_mapview setCenterCoordinate:_mapview.userLocation.coordinate animated:YES];
+		//[_mapview setCenterCoordinate:_mapview.userLocation.coordinate animated:YES];
 	self.view = _mapview;
+	_locationManager = [[CLLocationManager alloc]init];
+	_locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 	
 		//if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] isEqualToString:DTDataStorageICloud]) {
 	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUi) name:NSPersistentStoreCoordinatorStoresDidChangeNotification object:nil];
@@ -49,7 +52,11 @@
 	}
 
 }
-
+-(void)viewDidAppear:(BOOL)animated{
+	[super viewDidAppear:animated];
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(_locationManager.location.coordinate, 3000, 3000)animated:YES];
+	
+}
 -(void)dealloc{
 	[[NSNotificationCenter defaultCenter]removeObserver:self];
 }
@@ -95,18 +102,6 @@
 	
 	
 }
-/*
--(void)dataStoreDidUpdateFromUbiquityContainer:(NSNotification *)notification{
-	NSLog(@"update for container");
-	DTAppDelegate *delegate = (DTAppDelegate *)[[UIApplication sharedApplication]delegate];
-	[delegate.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-	[self updateUi];
-}
--(void)persistantStoreDidChange:(NSNotification *)notification{
-	
-	
-}
- */
 -(void)updateUi{
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.mapview removeOverlays:_mapview.overlays];

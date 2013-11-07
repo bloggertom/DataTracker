@@ -21,7 +21,7 @@
 -(id)init{
 	self = [super init];
 	if(self){
-		_reachability = [[Reachability alloc]init];
+		_reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
 		[_reachability setReachableOnWWAN:YES];
 		
 	}
@@ -29,7 +29,11 @@
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
-	
+	if (!_reachability.isReachableViaWWAN) {
+		NSLog(@"Connected on WIFI");
+		return;
+	}
+	NSLog(@"Location update, Reachable Via WWAN");
 	[_callback locationManagerHasUpdatedToLoaction:manager.location];
 	
 	

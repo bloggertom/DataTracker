@@ -20,10 +20,13 @@
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 1
 #define LTE_TEST 1
+#define DEBUG_BACKGROUND_ACTIVITY 0
 
 #define DefaultSpeed 10
 #define HSPAPlusSpeed 20
 #define FourGSpeed 50
+#define OverlayRadius 500
+#define DistanceFilter OverlayRadius * 1.5
 
 #define MinSpeed 0
 @interface DTMainViewController ()
@@ -75,6 +78,7 @@
 	_locationManager.delegate = _locationDelegate;
 	_locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 	_locationManager.pausesLocationUpdatesAutomatically = NO;
+		//_locationManager.distanceFilter = DistanceFilter;
 	
 		//track user location. May not be needed?
 		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
@@ -195,10 +199,12 @@
 
 -(void)beginTracking{
 	NSLog(@"Tracking");
-	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
+#if DEBUG_BACKGROUND_ACTIVITY
+	[self.locationManager startUpdatingLocation];
+#else
 	[self.locationManager startMonitoringSignificantLocationChanges];
+#endif
 	self.tracking = YES;
-	
 #if DEBUG_OVERLAYS
 	_currentLocation = self.locationManager.location;
 	double delayInSeconds = 4.0;
@@ -230,15 +236,18 @@
 	if ([[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
 			[self loadOverlays];
 	}
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
 	
 }
 
 #pragma mark - Overlay addition
 #pragma mark - Location Updates
 -(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location{
-
+#if DEBUG_BACKGROUND_ACTIVITY
+	[_locationManager allowDeferredLocationUpdatesUntilTraveled:0 timeout:5];
+	return;
+#endif
 	_currentLocation = location;
-	NSLog(@"new location update");
 	self.progressLabel.text = @"Testing Connection";
 	[UIView animateWithDuration:0.5 animations:^{
 		self.progressLabel.alpha = 1;
@@ -269,7 +278,7 @@
 	
 	CLLocation *location = [_currentLocation copy];
 	
-	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:500];
+	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:OverlayRadius];
 	circle.alpha = alpha;
 	circle.title = [NSString stringWithFormat:@"%1.1f Mbs",Mbs];
 	if ([[NSUserDefaults standardUserDefaults]boolForKey:kDataType4G]) {

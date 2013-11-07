@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
 
-@interface DTiPadViewController : UIViewController
+@interface DTiPadViewController : UIViewController <MKMapViewDelegate>
 
 
 @property (nonatomic, strong)MKMapView *mapview;
