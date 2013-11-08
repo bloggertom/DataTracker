@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 Thomas Wilson. All rights reserved.
 //
 
+#include <sys/sysctl.h>
+
 #import "DTMainViewController.h"
 #import "DTLocationDelegate.h"
 #import "DTMapViewDelegate.h"
@@ -15,7 +17,7 @@
 #import "DTMMergableOverlay.h"
 #import "DTAppDelegate.h"
 #import "DTSettingsViewController.h"
-#include <sys/sysctl.h>
+#import "DTOverlayDetailViewController.h"
 	//White Box Test cases
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 1
@@ -177,6 +179,7 @@
 #pragma mark - iCloud
 
 -(void)updateUi{
+		//reload on main thread for concurrency
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.mapview removeOverlays:self.mapview.overlays];
 		NSMutableArray *annotations = [self.mapview.annotations mutableCopy];
@@ -202,6 +205,8 @@
 	[self.locationManager startMonitoringSignificantLocationChanges];
 #endif
 	self.tracking = YES;
+	
+	
 #if DEBUG_OVERLAYS
 	_currentLocation = self.locationManager.location;
 	double delayInSeconds = 4.0;
@@ -250,7 +255,7 @@
 		self.progressLabel.alpha = 1;
 	} completion:^(BOOL finished) {
 		
-#if !FIELD_TEST
+#if !FIELD_TEST//debuging stuff
 		[_speedTester checkSpeed];
 #elif FIELD_TEST
 		double delayInSeconds = 2.0;
@@ -263,27 +268,30 @@
 
 }
 
-#pragma mark - Speed Test delegate methods
+#pragma mark - Speed Test callbacks
 -(void)speedTesterProgressDidChange:(int)perProgress{
+	if (perProgress > 100) {
+		perProgress = 100;
+	}
 	self.progressLabel.text = [NSString stringWithFormat:@"%d%%",perProgress];
 	self.progressLabel.alpha = 1;
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
 	NSLog(@"Finished with Mbs %f",Mbs);
-		//y = 1 + (x-A)*(0.7-0)/(B-A), RANGE A-B
 	double alpha = Mbs * 0.8 / _MaxSpeed;
 	
 	CLLocation *location = [_currentLocation copy];
-	
+		//build new mergable overlay using speed test result
 	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:OverlayRadius];
 	circle.alpha = alpha;
 	circle.title = [NSString stringWithFormat:@"%1.1f Mbs",Mbs];
+		//green overlays for true 4G otherwise blue
 	if ([[NSUserDefaults standardUserDefaults]boolForKey:kDataType4G]) {
 		circle.color = [UIColor greenColor];
 	}else{
 		circle.color = [UIColor blueColor];
 	}
-	
+		//add new overlay to mapview.
 	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
 	
 	[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -291,7 +299,7 @@
 	} completion:nil];
 }
 
-#pragma mark - call back methods from map view delegate
+#pragma mark - Mapview Delegate Callbacks
 -(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay{
 #if !DEBUG_OVERLAYS
 		//check overlay was mergable circle
@@ -312,6 +320,10 @@
 		if(![context save:&error]){
 			NSLog(@"Failed to save context: %@", [error localizedDescription]);
 			NSLog(@"%@", [overlayM debugDescription]);
+			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Holy Shoot!" message:@"The application was unable to save the new overlay" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+			[_mapview removeOverlay:overlay];
+			[_mapview removeAnnotation:overlay];
+			[context rollback];
 		}
 	}
 	
@@ -326,7 +338,7 @@
 			//if so update model context
 		DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
-		
+			//build request using location coordinates
 		NSFetchRequest *request = [[NSFetchRequest alloc]init];
 		NSNumber *longitude = [NSNumber numberWithDouble:[overlay coordinate].longitude];
 		NSNumber *latitude = [NSNumber numberWithDouble:[overlay coordinate].latitude];
@@ -339,18 +351,40 @@
 		
 		NSError *error = nil;
 		NSArray *array = [context executeFetchRequest:request error:&error];
-		
-		if (array != nil) {
+			//delete overlay (assumes only a single overlay in array)
+		if (array != nil && error == nil) {
 			DTMMergableOverlay *deleteMe = [array firstObject];
 			[context deleteObject:deleteMe];
-		}else{
-			NSLog(@"Failed to delete overlay: %@", [error localizedDescription]);
+			if ([context save:&error]) {
+				
+				UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Uh Oh!" message:@"The application was unable to remove the overlay" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+				[alert show];
+				[_mapview addOverlay:overlay];
+				[_mapview addAnnotation:overlay];
+				[context rollback];
+			}
+		}
+		if (error) {
+			NSLog(@"Failed to delete overlay: %@", error);
 		}
 	}
 #endif
 }
 
-#pragma mark - settings cotroller handlers
+-(void)userDidTapAccessoryButton:(UIButton *)button forAnnotation:(id <MKAnnotation>)annotation{
+		//check if it's a relavent overlay
+	if ([annotation isKindOfClass:[DTMergableCircleOverlay class]]) {
+			//if so build detail view controller and display.
+		DTMergableCircleOverlay *overlay = (DTMergableCircleOverlay *)annotation;
+		DTOverlayDetailViewController *controller = [[DTOverlayDetailViewController alloc]init];
+		controller.callback = self;
+		controller.overlay = overlay;
+		UINavigationController *navController = [[UINavigationController alloc]initWithRootViewController:controller];
+		[self presentViewController:navController animated:YES completion:nil];
+	}
+}
+
+#pragma mark - settings controller handlers
 
 -(void)switchValueDidChanged:(BOOL)on{
 	[self correctMaxSpeed];
@@ -371,6 +405,7 @@
 }
 
 -(void)segmentControlValueDidChange:(NSInteger)index{
+		//Callback from settings controller to update current map type
 	switch (index) {
 		case 0:
 			self.mapview.mapType = MKMapTypeStandard;
@@ -396,27 +431,42 @@
 }
 
 -(void)userDidRequestDataWhipe{
+		//retrive managed context
 	DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 	NSManagedObjectContext *context = delegate.managedObjectContext;
+		//get all current overlays
 	NSEntityDescription *overlayDescritptions = [NSEntityDescription entityForName:@"MergableOverlay" inManagedObjectContext:context];
 	NSFetchRequest *request = [[NSFetchRequest alloc]init];
 	[request setEntity:overlayDescritptions];
 	
+		//remove them all from the current context
 	NSError *error = nil;
 	NSArray *overlays = [context executeFetchRequest:request error:&error];
 	if (!error) {
 		for (DTMMergableOverlay *overlay in overlays) {
 			[context deleteObject:overlay];
 		}
-		
 		[context save:&error];
 	}
+		//if error let the user know about it
 	if (error) {
 		UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Oops!" message:@"Something went wrong!\n Unable to delete user data" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
 		[alert show];
 		NSLog(@"Failed to delete user data with error:\n%@", error);
 	}else{
+			//otherwise update ui
 		[self updateUi];
 	}
 }
+
+#pragma mark - Overlay Description Callback
+
+-(void)userDidRequestRemovalOfOverlay:(DTMergableCircleOverlay *)overlay{
+		//remove overlay from map
+	[_mapview removeOverlay:overlay];
+	[_mapview removeAnnotation:overlay];
+		//remove from context by calling this callback back method for the map delegate
+	[self mapViewDelegateDidRemoveOverlay:overlay];
+}
+
 @end

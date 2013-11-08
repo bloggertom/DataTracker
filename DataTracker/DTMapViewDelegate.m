@@ -89,6 +89,8 @@
 	return renderer;
 }
 
+#pragma mark - Annotations
+
 -(MKAnnotationView*)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation{
 	MKAnnotationView *view = nil;
 	
@@ -99,10 +101,23 @@
 		view.canShowCallout = YES;
 		view.image = nil;
 		view.calloutOffset = CGPointMake(0, 32);
+		
+		UIButton *button = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+		view.rightCalloutAccessoryView = button;
 	}
 	
 	
 	return view;
+}
 
+-(void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control{
+	id <MKAnnotation> annotation = view.annotation;
+	UIButton *button;
+	if ([control isKindOfClass:[UIButton class]]) {
+		NSLog(@"Accessory Button Pushed");
+		button = (UIButton *)control;
+	}
+	
+	[self.callback userDidTapAccessoryButton:button forAnnotation:annotation];
 }
 @end

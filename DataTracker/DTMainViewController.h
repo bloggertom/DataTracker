@@ -35,9 +35,12 @@
 
 -(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay;
 -(void)mapViewDelegateDidRemoveOverlay:(id<MKOverlay>)overlay;
-
+-(void)userDidTapAccessoryButton:(UIButton *)button forAnnotation:(id <MKAnnotation>)annotation;
 
 -(void)switchValueDidChanged:(BOOL)on;
 -(void)segmentControlValueDidChange:(NSInteger)index;
 -(void)userDidRequestDataWhipe;
+
+-(void)userDidRequestRemovalOfOverlay:(DTMergableCircleOverlay *)overlay;
+
 @end
