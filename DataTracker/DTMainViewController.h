@@ -39,4 +39,5 @@
 
 -(void)switchValueDidChanged:(BOOL)on;
 -(void)segmentControlValueDidChange:(NSInteger)index;
+-(void)userDidRequestDataWhipe;
 @end

@@ -19,7 +19,7 @@
 	//White Box Test cases
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 1
-#define LTE_TEST 1
+#define LTE_TEST 0
 #define DEBUG_BACKGROUND_ACTIVITY 0
 
 #define DefaultSpeed 10
@@ -88,8 +88,9 @@
 	_speedTester = [[DTSpeedTester alloc]init];
 	_speedTester.callback = self;
 	
-	[self setUpUI];
+	
 	[self.view addSubview:_mapview];
+	[self setUpUI];
 	
 		//if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] isEqualToString:DTDataStorageICloud]) {
 	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(updateUi) name:NSPersistentStoreCoordinatorStoresDidChangeNotification object:nil];
@@ -174,17 +175,13 @@
 }
 
 #pragma mark - iCloud
-/*
--(void)dataStoreDidUpdateFromUbiquityContainer:(NSNotification *)notification{
-	NSLog(@"update for container");
-	DTAppDelegate *delegate = (DTAppDelegate *)[[UIApplication sharedApplication]delegate];
-	[delegate.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-	[self updateUi];
-}
- */
+
 -(void)updateUi{
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[self.mapview removeOverlays:self.mapview.overlays];
+		NSMutableArray *annotations = [self.mapview.annotations mutableCopy];
+		[annotations removeObject:self.mapview.userLocation];
+		[self.mapview removeAnnotations:self.mapview.annotations];
 		[self loadOverlays];
 	});
 	
@@ -259,7 +256,7 @@
 		double delayInSeconds = 2.0;
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform(_MaxSpeed)+1];
+			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform((int)_MaxSpeed)+1];
 		});
 #endif
 	}];
@@ -396,5 +393,30 @@
 	settingsViewController.modalTransitionStyle = UIModalTransitionStylePartialCurl;
 	settingsViewController.callBack = self;
 	[self presentViewController:settingsViewController animated:YES completion:nil];
+}
+
+-(void)userDidRequestDataWhipe{
+	DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
+	NSManagedObjectContext *context = delegate.managedObjectContext;
+	NSEntityDescription *overlayDescritptions = [NSEntityDescription entityForName:@"MergableOverlay" inManagedObjectContext:context];
+	NSFetchRequest *request = [[NSFetchRequest alloc]init];
+	[request setEntity:overlayDescritptions];
+	
+	NSError *error = nil;
+	NSArray *overlays = [context executeFetchRequest:request error:&error];
+	if (!error) {
+		for (DTMMergableOverlay *overlay in overlays) {
+			[context deleteObject:overlay];
+		}
+		
+		[context save:&error];
+	}
+	if (error) {
+		UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Oops!" message:@"Something went wrong!\n Unable to delete user data" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+		[alert show];
+		NSLog(@"Failed to delete user data with error:\n%@", error);
+	}else{
+		[self updateUi];
+	}
 }
 @end
