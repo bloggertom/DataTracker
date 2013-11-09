@@ -139,7 +139,7 @@
 	
 		//switch and removal button - This could be put into a UIView subclass as it's been used twice
 	_removeButton = [UIButton buttonWithType:UIButtonTypeSystem];
-	[_removeButton setTitle:@"Remove All Results" forState:UIControlStateNormal];
+	[_removeButton setTitle:@"Remove Result" forState:UIControlStateNormal];
 	_removeButton.titleLabel.font = [UIFont boldSystemFontOfSize:18];
 	[_removeButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
 	[_removeButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
