@@ -44,6 +44,24 @@
 	_start = [NSDate timeIntervalSinceReferenceDate];
 }
 
+-(void)performSynchronousSpeedTest{
+	NSLog(@"perfoming synchronous speed test");
+	double result = [DTSpeedTester performSynchronousSpeedTest];
+	[self speedtesterHasFinishedSynchronousSpeedTestWithResult:result];
+}
+
++(double)performSynchronousSpeedTest{
+	NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://download.thinkbroadband.com/5MB.zip"]];
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+	NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	NSTimeInterval finish = [NSDate timeIntervalSinceReferenceDate];
+	double dataSize = data.length;
+	
+	double result = (dataSize /kBitInMb) / (finish / start);
+	return result;
+}
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{
 	double dataSize = data.length * 8;
 	NSTimeInterval finish = [NSDate timeIntervalSinceReferenceDate];
@@ -85,6 +103,10 @@
 	
 	double result = total / [_speeds count];
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+	[self.callback speedTesterDidFinishSpeedTestWithResult:result];
+}
+
+-(void)speedtesterHasFinishedSynchronousSpeedTestWithResult:(double)result{
 	[self.callback speedTesterDidFinishSpeedTestWithResult:result];
 }
 

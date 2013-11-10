@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DBF984DC17FF2E2D00A75DF1"
-               BuildableName = "DataTracker.app"
-               BlueprintName = "DataTracker"
-               ReferencedContainer = "container:DataTracker.xcodeproj">
+               BuildableName = "Signal Tracker.app"
+               BlueprintName = "Signal Tracker"
+               ReferencedContainer = "container:Signal Tracker.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DBF984FC17FF2E2D00A75DF1"
-               BuildableName = "DataTrackerTests.xctest"
-               BlueprintName = "DataTrackerTests"
-               ReferencedContainer = "container:DataTracker.xcodeproj">
+               BuildableName = "Signal TrackerTests.xctest"
+               BlueprintName = "Signal TrackerTests"
+               ReferencedContainer = "container:Signal Tracker.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DBF984DC17FF2E2D00A75DF1"
-            BuildableName = "DataTracker.app"
-            BlueprintName = "DataTracker"
-            ReferencedContainer = "container:DataTracker.xcodeproj">
+            BuildableName = "Signal Tracker.app"
+            BlueprintName = "Signal Tracker"
+            ReferencedContainer = "container:Signal Tracker.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DBF984DC17FF2E2D00A75DF1"
-            BuildableName = "DataTracker.app"
-            BlueprintName = "DataTracker"
-            ReferencedContainer = "container:DataTracker.xcodeproj">
+            BuildableName = "Signal Tracker.app"
+            BlueprintName = "Signal Tracker"
+            ReferencedContainer = "container:Signal Tracker.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -80,9 +80,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DBF984DC17FF2E2D00A75DF1"
-            BuildableName = "DataTracker.app"
-            BlueprintName = "DataTracker"
-            ReferencedContainer = "container:DataTracker.xcodeproj">
+            BuildableName = "Signal Tracker.app"
+            BlueprintName = "Signal Tracker"
+            ReferencedContainer = "container:Signal Tracker.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
@@ -91,6 +91,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Signal Tracker"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

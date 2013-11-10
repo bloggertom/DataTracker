@@ -37,6 +37,16 @@
 	[_callback locationManagerHasUpdatedToLoaction:manager.location];
 	
 	
+	
 }
 
+-(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
+	switch (status) {
+		case kCLAuthorizationStatusAuthorized:
+			[self.callback centerOnUser];
+			break;
+		default:
+			break;
+	}
+}
 @end

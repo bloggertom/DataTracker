@@ -28,7 +28,7 @@
 	
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-	
+	//[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #if USE_ICLOUD
 		//Check iCloud availability
 	id currentiCloudToken = [[NSFileManager defaultManager] ubiquityIdentityToken];

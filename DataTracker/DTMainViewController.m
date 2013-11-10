@@ -20,7 +20,7 @@
 #import "DTOverlayDetailViewController.h"
 	//White Box Test cases
 #define DEBUG_OVERLAYS 0
-#define FIELD_TEST 1
+#define FIELD_TEST 0
 #define LTE_TEST 0
 #define DEBUG_BACKGROUND_ACTIVITY 0
 
@@ -37,6 +37,7 @@
 @property (nonatomic, strong)CLLocationManager *locationManager;
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property(nonatomic, strong)CLLocation *currentLocation;
+@property (nonatomic)UIBackgroundTaskIdentifier bgTask;
 @property (nonatomic)NSInteger MaxSpeed;
 
 @end
@@ -101,6 +102,11 @@
 	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadOverlays) name:UserChoseStorageTypeNotification object:nil];
 	
 }
+-(void)centerOnUser{
+	NSLog(@"Center On user");
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
+	
+}
 
 -(void)dealloc{
 	[[NSNotificationCenter defaultCenter]removeObserver:self];
@@ -135,6 +141,7 @@
 	
 		//add progress label
 	_progressLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 200, 50)];
+	self.progressLabel.textColor = [UIColor lightTextColor];
 	_progressLabel.alpha = 0;
 	[self.view addSubview:_progressLabel];
 
@@ -238,8 +245,6 @@
 	if ([[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
 			[self loadOverlays];
 	}
-	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
-	
 }
 
 #pragma mark - Overlay addition
@@ -250,22 +255,30 @@
 	return;
 #endif
 	_currentLocation = location;
-	self.progressLabel.text = @"Testing Connection";
-	[UIView animateWithDuration:0.5 animations:^{
-		self.progressLabel.alpha = 1;
-	} completion:^(BOOL finished) {
-		
-#if !FIELD_TEST//debuging stuff
+	if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+		_bgTask = [[UIApplication sharedApplication]beginBackgroundTaskWithExpirationHandler:^{
+			[[UIApplication sharedApplication]endBackgroundTask:_bgTask];
+			_bgTask = UIBackgroundTaskInvalid;
+			NSLog(@"Ran out of time!");
+		}];
 		[_speedTester checkSpeed];
+	}else{
+		self.progressLabel.text = @"Testing Connection";
+		[UIView animateWithDuration:0.5 animations:^{
+			self.progressLabel.alpha = 1;
+		} completion:^(BOOL finished) {
+			
+#if !FIELD_TEST//debuging stuff
+			[_speedTester checkSpeed];
 #elif FIELD_TEST
-		double delayInSeconds = 2.0;
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform((int)_MaxSpeed)+1];
-		});
+			double delayInSeconds = 2.0;
+			dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+			dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+				[self speedTesterDidFinishSpeedTestWithResult:arc4random_uniform((int)_MaxSpeed)+1];
+			});
 #endif
-	}];
-
+		}];
+	}
 }
 
 #pragma mark - Speed Test callbacks
@@ -277,7 +290,7 @@
 	self.progressLabel.alpha = 1;
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
-	NSLog(@"Finished with Mbs %f",Mbs);
+	NSLog(@"Finished with Mbs %f", Mbs);
 	double alpha = Mbs * 0.8 / _MaxSpeed;
 	
 	CLLocation *location = [_currentLocation copy];
@@ -294,9 +307,15 @@
 		//add new overlay to mapview.
 	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
 	
-	[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-		self.progressLabel.alpha = 0;
-	} completion:nil];
+	if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground && _bgTask != UIBackgroundTaskInvalid) {
+		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
+		_bgTask = UIBackgroundTaskInvalid;
+	}else{
+	
+		[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+			self.progressLabel.alpha = 0;
+		} completion:nil];
+	}
 }
 
 #pragma mark - Mapview Delegate Callbacks
@@ -321,6 +340,7 @@
 			NSLog(@"Failed to save context: %@", [error localizedDescription]);
 			NSLog(@"%@", [overlayM debugDescription]);
 			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Holy Shoot!" message:@"The application was unable to save the new overlay" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+			[alert show];
 			[_mapview removeOverlay:overlay];
 			[_mapview removeAnnotation:overlay];
 			[context rollback];
@@ -355,7 +375,7 @@
 		if (array != nil && error == nil) {
 			DTMMergableOverlay *deleteMe = [array firstObject];
 			[context deleteObject:deleteMe];
-			if ([context save:&error]) {
+			if (![context save:&error]) {
 				
 				UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Uh Oh!" message:@"The application was unable to remove the overlay" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
 				[alert show];

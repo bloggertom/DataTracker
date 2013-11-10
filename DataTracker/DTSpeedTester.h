@@ -14,5 +14,7 @@
 @property (nonatomic, weak, setter=delegate:)DTMainViewController *callback;
 
 -(void)checkSpeed;
+-(void)performSynchronousSpeedTest;
++(double)performSynchronousSpeedTest;
 
 @end

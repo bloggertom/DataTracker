@@ -26,6 +26,8 @@
 +(BOOL)FourGEnabledModel;
 +(NSString *)getModel;
 
+-(void)centerOnUser;
+
 -(void)beginTracking;
 -(void)stopTracking;
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success;
