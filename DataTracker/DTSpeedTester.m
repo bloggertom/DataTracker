@@ -9,14 +9,16 @@
 #import "DTSpeedTester.h"
 #import "DTMainViewController.h"
 #define kBitInMb 1048576
-#define kMbTestSize 2.5
+#define kBitInMB 8388608
+#define kMBTestSize 5
 @interface DTSpeedTester()
 
 @property(nonatomic, strong)NSMutableArray *speeds;
 @property(nonatomic)NSTimeInterval start;
 @property(nonatomic, strong)NSMutableData *data;
+@property(nonatomic, strong)NSURLConnection *connection;
 @property(nonatomic)BOOL testing;
-@property(nonatomic)double expectedSize;
+@property(nonatomic)double expectedSizeBits;
 @end
 
 @implementation DTSpeedTester
@@ -39,9 +41,9 @@
  @abstract Returns speed of connection in Mb/s.
  */
 -(void)checkSpeed{
-	[NSURLConnection connectionWithRequest:_request delegate:self];
+	_connection = [NSURLConnection connectionWithRequest:_request delegate:self];
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-	_start = [NSDate timeIntervalSinceReferenceDate];
+		//_start = [NSDate timeIntervalSinceReferenceDate];
 }
 
 -(void)performSynchronousSpeedTest{
@@ -65,17 +67,18 @@
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data{
 	double dataSize = data.length * 8;
 	NSTimeInterval finish = [NSDate timeIntervalSinceReferenceDate];
-	NSNumber *resultSpeed = [NSNumber numberWithDouble:(dataSize / kBitInMb) / (finish - _start)];
+	NSNumber *resultSpeed = [NSNumber numberWithDouble:((dataSize / kBitInMb) / (finish - _start))];
 	[_speeds addObject:resultSpeed];
-	_start = finish;
+	NSLog(@"Speed %f, %f, %ui", resultSpeed.doubleValue, finish-_start, data.length);
+		//_start = finish;
 	[_data appendData:data];
 	
 	if(_testing){
-		int progress = ABS(_data.length/_expectedSize * 100);
+		int progress = ABS(((_data.length*8)/_expectedSizeBits) * 100);
 	    [self.callback speedTesterProgressDidChange:progress];
 	}
-	if((_data.length) >= _expectedSize){
-		[connection cancel];
+	if((_data.length*8) >= _expectedSizeBits){
+		[self cancelDownload];
 		[self connectionDidFinishLoading:connection];
 	}
 }
@@ -83,8 +86,11 @@
 -(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response{
 	if(!_testing){
 		_testing = YES;
-		_expectedSize = kMbTestSize * (kBitInMb/8);
-		NSLog(@"Expected Size %f", _expectedSize);
+		
+		_expectedSizeBits = response.expectedContentLength * 8;
+		_expectedSizeBits = _expectedSizeBits/2;
+		NSLog(@"Expected Size %f", _expectedSizeBits);
+		_start = [NSDate timeIntervalSinceReferenceDate];
 	}else{
 			//something strange in the neighbourhood
 		
@@ -96,18 +102,34 @@
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection{
-	double total = 0.0;
-	for (NSNumber *num in _speeds) {
+		//double total = 0.0;
+	/*for (NSNumber *num in _speeds) {
 		total += num.doubleValue;
-	}
-	
-	double result = total / [_speeds count];
+	}*/
+	NSTimeInterval finish = [NSDate timeIntervalSinceReferenceDate];
+	double thing = (_data.length * 8)/kBitInMb;
+	NSLog(@"total download in Mb %f", thing);
+	double result =  thing / (finish - _start);
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	[self.callback speedTesterDidFinishSpeedTestWithResult:result];
 }
 
 -(void)speedtesterHasFinishedSynchronousSpeedTestWithResult:(double)result{
+	_connection = nil;
 	[self.callback speedTesterDidFinishSpeedTestWithResult:result];
 }
 
+-(void)cancelDownload{
+	if (_connection) {
+		[_connection cancel];
+		_connection = nil;
+	}
+		
+
+}
+-(void)forceDownloadToFinish{
+	[self connectionDidFinishLoading:_connection];
+	[self cancelDownload];
+	
+}
 @end

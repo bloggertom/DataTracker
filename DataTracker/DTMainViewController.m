@@ -141,7 +141,7 @@
 	
 		//add progress label
 	_progressLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 200, 50)];
-	self.progressLabel.textColor = [UIColor lightTextColor];
+		//self.progressLabel.textColor = [UIColor lightTextColor];
 	_progressLabel.alpha = 0;
 	[self.view addSubview:_progressLabel];
 
@@ -289,6 +289,14 @@
 	}
 	self.progressLabel.text = [NSString stringWithFormat:@"%d%%",perProgress];
 	self.progressLabel.alpha = 1;
+	
+	if (_bgTask != UIBackgroundTaskInvalid) {
+		if ([[UIApplication sharedApplication]backgroundTimeRemaining] < 10) {
+			NSLog(@"Download takening too long");
+			[self.speedTester forceDownloadToFinish];
+			NSLog(@"Download ended prematurely");
+		}
+	}
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
 	NSLog(@"Finished with Mbs %f", Mbs);
@@ -297,7 +305,9 @@
 		result = _MaxSpeed;
 	}
 	double alpha = result * 0.8 / _MaxSpeed;
-	
+	if (alpha < 0.1) {
+		alpha = 0.1;
+	}
 	CLLocation *location = [_currentLocation copy];
 		//build new mergable overlay using speed test result
 	DTMergableCircleOverlay *circle = [DTMergableCircleOverlay circleWithCenterCoordinate:location.coordinate radius:OverlayRadius];
@@ -311,17 +321,17 @@
 	}
 		//add new overlay to mapview.
 	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
-	
+	NSLog(@"overlay added");
 	if (_bgTask != UIBackgroundTaskInvalid) {
 		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
 		_bgTask = UIBackgroundTaskInvalid;
 		NSLog(@"Ended background task");
-	}else{
-	
-		[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-			self.progressLabel.alpha = 0;
-		} completion:nil];
 	}
+	
+	[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+		self.progressLabel.alpha = 0;
+	} completion:nil];
+	
 }
 
 #pragma mark - Mapview Delegate Callbacks
@@ -330,6 +340,7 @@
 		//check overlay was mergable circle
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
 			//if so update model context
+		NSLog(@"adding overlay to context");
 		DTMergableCircleOverlay *circle = (DTMergableCircleOverlay *)overlay;
 		DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
@@ -362,6 +373,7 @@
 		//check overlay was a Mergable circle
 	if ([overlay isKindOfClass:[DTMergableCircleOverlay class]]) {
 			//if so update model context
+		NSLog(@"removing Overlay from context");
 		DTAppDelegate *delegate = (DTAppDelegate *)[UIApplication sharedApplication].delegate;
 		NSManagedObjectContext *context = delegate.managedObjectContext;
 			//build request using location coordinates
@@ -424,8 +436,6 @@
 		}else{
 			_MaxSpeed = HSPAPlusSpeed;
 		}
-	}else if([[DTMainViewController getModel]rangeOfString:@"4"].location != NSNotFound || [[DTMainViewController getModel]rangeOfString:@"3,3"].location != NSNotFound){
-		_MaxSpeed = HSPAPlusSpeed;
 	}else{
 		_MaxSpeed = DefaultSpeed;
 	}

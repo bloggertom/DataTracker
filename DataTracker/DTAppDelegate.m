@@ -185,47 +185,28 @@
     }
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
 	
-		//dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
+
 		NSError *error = nil;
 		NSString *storeName = @"DataTracker.sqlite";
-			//NSString *icloudStoreDirectory = @"Data.nosync";
-			//NSString *icloudLogDirectory = @"Logs";
+
 		NSURL *localStoreURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:storeName];
 		NSMutableDictionary *options = [[NSMutableDictionary alloc]init];
-			//NSFileManager *fileManager = [NSFileManager defaultManager];
 		
 		if([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"]isEqualToString: DTDataStorageICloud]){
-			/*
-			NSURL *iCloud = [fileManager URLForUbiquityContainerIdentifier:nil];
-			NSURL *logsPath = [iCloud URLByAppendingPathComponent:icloudLogDirectory isDirectory:YES];
-			NSURL *dataPath = [iCloud URLByAppendingPathComponent:icloudStoreDirectory isDirectory:YES];
 			
-			if ([fileManager fileExistsAtPath:dataPath.path] != YES) {
-				NSError *fileError = nil;
-				
-				[fileManager createDirectoryAtPath:dataPath.path withIntermediateDirectories:YES attributes:nil error:&fileError];
-				if (fileError) {
-					NSLog(@"Error Creating Ubiquitous data store: %@", fileError);
-				}
-			}
-			*/
 			
 			[options setObject:@"DataTracker_iCloud_Store" forKey:NSPersistentStoreUbiquitousContentNameKey];
 			[options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
             [options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
-				//[options setObject:logsPath                forKey:NSPersistentStoreUbiquitousContentURLKey];
 			
 			[_persistentStoreCoordinator lock];
-			
 			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:options error:&error];
-			
 			[_persistentStoreCoordinator unlock];
 			
 		}else{
 			[_persistentStoreCoordinator lock];
 			
 			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:nil error:&error];
-			
 			[_persistentStoreCoordinator unlock];
 		}
 		if (error != nil) {
@@ -255,8 +236,6 @@
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 			abort();
 		}
-
-		//});
 	   
     return _persistentStoreCoordinator;
 }

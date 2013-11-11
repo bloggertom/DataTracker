@@ -17,4 +17,6 @@
 -(void)performSynchronousSpeedTest;
 +(double)performSynchronousSpeedTest;
 
+-(void)forceDownloadToFinish;
+
 @end
