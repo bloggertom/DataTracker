@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "DataTracker/DTMainViewController.m"
-            timestampString = "405740080.763356"
+            timestampString = "405826702.457968"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "339"
-            endingLineNumber = "339"
+            startingLineNumber = "345"
+            endingLineNumber = "345"
             landmarkName = "-mapViewDelegateDidAddOverlay:"
             landmarkType = "5">
          </BreakpointContent>

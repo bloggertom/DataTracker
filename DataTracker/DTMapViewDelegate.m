@@ -17,6 +17,7 @@
 @interface DTMapViewDelegate ()
 @property (nonatomic, strong)DTSpeedTester *speedTester;
 @property (nonatomic)BOOL inicialRender;
+@property (nonatomic)BOOL initialLocation;
 	//@property (nonatomic)CGFloat alpha;
 @end
 
@@ -27,6 +28,7 @@
 	if (self) {
 		_speedTester = [[DTSpeedTester alloc]init];
 		_inicialRender = YES;
+		_initialLocation = YES;
 	}
 	return self;
 }
@@ -119,5 +121,12 @@
 	}
 	
 	[self.callback userDidTapAccessoryButton:button forAnnotation:annotation];
+}
+
+-(void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation{
+	if (_initialLocation) {
+		[self.callback centerOnUser];
+		_initialLocation = NO;
+	}
 }
 @end

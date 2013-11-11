@@ -9,7 +9,7 @@
 #import "DTLocationDelegate.h"
 #import "Reachability.h"
 #import "DTMainViewController.h"
-
+#include "TargetConditionals.h"
 @interface DTLocationDelegate()
 
 @property(nonatomic, strong)Reachability *reachability;
@@ -29,10 +29,12 @@
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
+#if !(TARGET_IPHONE_SIMULATOR)
 	if (!_reachability.isReachableViaWWAN) {
 		NSLog(@"Connected on WIFI");
 		return;
 	}
+#endif
 	NSLog(@"Location update, Reachable Via WWAN");
 	[_callback locationManagerHasUpdatedToLoaction:manager.location];
 	

@@ -104,7 +104,7 @@
 }
 -(void)centerOnUser{
 	NSLog(@"Center On user");
-	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.locationManager.location.coordinate, 1500, 1500)animated:YES];
+	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.mapview.userLocation.coordinate, 1500, 1500)animated:YES];
 	
 }
 
@@ -255,14 +255,7 @@
 	return;
 #endif
 	_currentLocation = location;
-	if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
-		_bgTask = [[UIApplication sharedApplication]beginBackgroundTaskWithExpirationHandler:^{
-			[[UIApplication sharedApplication]endBackgroundTask:_bgTask];
-			_bgTask = UIBackgroundTaskInvalid;
-			NSLog(@"Ran out of time!");
-		}];
-		[_speedTester checkSpeed];
-	}else{
+	if([[UIApplication sharedApplication]applicationState] == UIApplicationStateActive){
 		self.progressLabel.text = @"Testing Connection";
 		[UIView animateWithDuration:0.5 animations:^{
 			self.progressLabel.alpha = 1;
@@ -278,6 +271,14 @@
 			});
 #endif
 		}];
+	}else if([[UIApplication sharedApplication]applicationState] == UIApplicationStateBackground){
+		NSLog(@"Running background task");
+		_bgTask = [[UIApplication sharedApplication]beginBackgroundTaskWithExpirationHandler:^{
+			[[UIApplication sharedApplication]endBackgroundTask:_bgTask];
+			_bgTask = UIBackgroundTaskInvalid;
+			NSLog(@"Ran out of time!");
+		}];
+		[_speedTester checkSpeed];
 	}
 }
 
@@ -291,7 +292,11 @@
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
 	NSLog(@"Finished with Mbs %f", Mbs);
-	double alpha = Mbs * 0.8 / _MaxSpeed;
+	double result = Mbs;
+	if (Mbs > _MaxSpeed) {
+		result = _MaxSpeed;
+	}
+	double alpha = result * 0.8 / _MaxSpeed;
 	
 	CLLocation *location = [_currentLocation copy];
 		//build new mergable overlay using speed test result
@@ -307,9 +312,10 @@
 		//add new overlay to mapview.
 	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
 	
-	if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground && _bgTask != UIBackgroundTaskInvalid) {
+	if (_bgTask != UIBackgroundTaskInvalid) {
 		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
 		_bgTask = UIBackgroundTaskInvalid;
+		NSLog(@"Ended background task");
 	}else{
 	
 		[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -418,6 +424,8 @@
 		}else{
 			_MaxSpeed = HSPAPlusSpeed;
 		}
+	}else if([[DTMainViewController getModel]rangeOfString:@"4"].location != NSNotFound || [[DTMainViewController getModel]rangeOfString:@"3,3"].location != NSNotFound){
+		_MaxSpeed = HSPAPlusSpeed;
 	}else{
 		_MaxSpeed = DefaultSpeed;
 	}
