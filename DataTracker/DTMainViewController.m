@@ -23,7 +23,7 @@
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 0
 #define LTE_TEST 0
-#define DEBUG_BACKGROUND_ACTIVITY 1
+#define DEBUG_BACKGROUND_ACTIVITY 0
 
 #define DefaultSpeed 10
 #define HSPAPlusSpeed 20

@@ -15,6 +15,5 @@ result.
 
 Make pin annotation appear when map is zoomed out
 
-Resolve Issues with background tasks
 
 Created for iOS 7.
