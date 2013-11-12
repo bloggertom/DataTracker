@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		DB102722182D4D130027BC4E /* DTOverlayDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB102721182D4D130027BC4E /* DTOverlayDetailViewController.m */; };
 		DB2D2DCF1827EC6B00F8BD96 /* DTiPadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB2D2DCE1827EC6B00F8BD96 /* DTiPadViewController.m */; };
+		DB557E73183261D9004C94D5 /* DTImprovedSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB557E72183261D9004C94D5 /* DTImprovedSpeedTester.m */; };
 		DB7BEA40181D81CA004655B2 /* DTMMergableOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */; };
 		DB7BEA43181F3EE5004655B2 /* DTSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */; };
 		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
@@ -53,6 +54,8 @@
 		DB102721182D4D130027BC4E /* DTOverlayDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DTOverlayDetailViewController.m; path = ../DTOverlayDetailViewController.m; sourceTree = "<group>"; };
 		DB2D2DCD1827EC6B00F8BD96 /* DTiPadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTiPadViewController.h; sourceTree = "<group>"; };
 		DB2D2DCE1827EC6B00F8BD96 /* DTiPadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTiPadViewController.m; sourceTree = "<group>"; };
+		DB557E71183261D9004C94D5 /* DTImprovedSpeedTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTImprovedSpeedTester.h; sourceTree = "<group>"; };
+		DB557E72183261D9004C94D5 /* DTImprovedSpeedTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTImprovedSpeedTester.m; sourceTree = "<group>"; };
 		DB7BEA3E181D81CA004655B2 /* DTMMergableOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMMergableOverlay.h; sourceTree = "<group>"; };
 		DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMMergableOverlay.m; sourceTree = "<group>"; };
 		DB7BEA41181F3EE5004655B2 /* DTSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSettingsViewController.h; sourceTree = "<group>"; };
@@ -205,6 +208,8 @@
 				DBF9851E17FF300500A75DF1 /* DTLocationDelegate.m */,
 				DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */,
 				DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */,
+				DB557E71183261D9004C94D5 /* DTImprovedSpeedTester.h */,
+				DB557E72183261D9004C94D5 /* DTImprovedSpeedTester.m */,
 			);
 			name = "Signal Tracker";
 			path = DataTracker;
@@ -359,6 +364,7 @@
 				DBF9852817FF4A3200A75DF1 /* Reachability.m in Sources */,
 				DB102722182D4D130027BC4E /* DTOverlayDetailViewController.m in Sources */,
 				DBF984F617FF2E2D00A75DF1 /* DataTracker.xcdatamodeld in Sources */,
+				DB557E73183261D9004C94D5 /* DTImprovedSpeedTester.m in Sources */,
 				DBF984EF17FF2E2D00A75DF1 /* main.m in Sources */,
 				DB7BEA43181F3EE5004655B2 /* DTSettingsViewController.m in Sources */,
 				DBF9851F17FF300500A75DF1 /* DTLocationDelegate.m in Sources */,

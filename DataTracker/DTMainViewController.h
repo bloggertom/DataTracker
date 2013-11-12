@@ -10,6 +10,9 @@
 #import <MapKit/MapKit.h>
 #define kDataType4G @"4Gdata"
 #define kMapType @"UserMapType"
+
+
+
 @class DTMapViewDelegate;
 @class DTLocationDelegate;
 @class Reachability;

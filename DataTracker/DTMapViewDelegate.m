@@ -61,6 +61,7 @@
 				}
 			}
 		}
+		
 		[mapView addOverlay:circle level:MKOverlayLevelAboveRoads];
 		[mapView addAnnotation:circle];
 		if (_callback) {

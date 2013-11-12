@@ -29,6 +29,7 @@
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
+
 #if !(TARGET_IPHONE_SIMULATOR)
 	if (!_reachability.isReachableViaWWAN) {
 		NSLog(@"Connected on WIFI");

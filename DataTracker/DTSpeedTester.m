@@ -42,6 +42,7 @@
  */
 -(void)checkSpeed{
 	_connection = [NSURLConnection connectionWithRequest:_request delegate:self];
+	
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 		//_start = [NSDate timeIntervalSinceReferenceDate];
 }

@@ -18,24 +18,26 @@
 #import "DTAppDelegate.h"
 #import "DTSettingsViewController.h"
 #import "DTOverlayDetailViewController.h"
+#import "DTImprovedSpeedTester.h"
 	//White Box Test cases
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 0
 #define LTE_TEST 0
-#define DEBUG_BACKGROUND_ACTIVITY 0
+#define DEBUG_BACKGROUND_ACTIVITY 1
 
 #define DefaultSpeed 10
 #define HSPAPlusSpeed 20
 #define FourGSpeed 50
 #define OverlayRadius 500
-#define DistanceFilter OverlayRadius * 1.5
+#define DistanceFilter 20
 
 #define MinSpeed 0
 @interface DTMainViewController ()
 @property (nonatomic, strong)DTMapViewDelegate *mapViewDelegate;
 @property (nonatomic, strong)DTLocationDelegate *locationDelegate;
 @property (nonatomic, strong)CLLocationManager *locationManager;
-@property (nonatomic, strong)DTSpeedTester *speedTester;
+	//@property (nonatomic, strong)DTSpeedTester *speedTester;
+@property (nonatomic, strong)DTImprovedSpeedTester *speedTester;
 @property(nonatomic, strong)CLLocation *currentLocation;
 @property (nonatomic)UIBackgroundTaskIdentifier bgTask;
 @property (nonatomic)NSInteger MaxSpeed;
@@ -81,14 +83,17 @@
 	_locationManager.delegate = _locationDelegate;
 	_locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 	_locationManager.pausesLocationUpdatesAutomatically = NO;
-		//_locationManager.distanceFilter = DistanceFilter;
 	
+#if DEBUG_BACKGROUND_ACTIVITY
+	_locationManager.distanceFilter = DistanceFilter;
+#endif
 		//track user location. May not be needed?
 		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
 	
 	
 		//speedTester
-	_speedTester = [[DTSpeedTester alloc]init];
+		//_speedTester = [[DTSpeedTester alloc]init];
+	_speedTester = [[DTImprovedSpeedTester alloc]init];
 	_speedTester.callback = self;
 	
 	
@@ -250,10 +255,10 @@
 #pragma mark - Overlay addition
 #pragma mark - Location Updates
 -(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location{
-#if DEBUG_BACKGROUND_ACTIVITY
-	[_locationManager allowDeferredLocationUpdatesUntilTraveled:0 timeout:5];
-	return;
-#endif
+	if(_speedTester.isTesting){
+		NSLog(@"speed tester busy");
+		return;
+	}
 	_currentLocation = location;
 	if([[UIApplication sharedApplication]applicationState] == UIApplicationStateActive){
 		self.progressLabel.text = @"Testing Connection";
@@ -320,7 +325,7 @@
 		circle.color = [UIColor blueColor];
 	}
 		//add new overlay to mapview.
-	[self.mapViewDelegate addOverlay:circle toMapView:self.mapview];
+	[self.mapViewDelegate addOverlay:circle toMapView: self.mapview];
 	NSLog(@"overlay added");
 	if (_bgTask != UIBackgroundTaskInvalid) {
 		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
