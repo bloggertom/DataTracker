@@ -29,7 +29,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
 	//[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-#if USE_ICLOUD
+
 		//Check iCloud availability
 	id currentiCloudToken = [[NSFileManager defaultManager] ubiquityIdentityToken];
 	if (currentiCloudToken) {
@@ -37,6 +37,7 @@
 		[[NSUserDefaults standardUserDefaults]setObject:newTokenData forKey:@"com.apple.DataTracker.UbiquityIdentityToken"];
 		
 	}else{
+		NSLog(@"removing icloud token");
 		[[NSUserDefaults standardUserDefaults]removeObjectForKey:@"com.apple.DataTracker.UbiquityIdentityToken"];
 	}
 	
@@ -47,8 +48,7 @@
 	}else{
 		[self userHasMadeStorageChoice];
 	}
-		//[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(iCloudAvailabilityChange) name:NSUbiquityIdentityDidChangeNotification object:nil];
-#endif
+
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 		
 		_mainIPadController = [[DTiPadViewController alloc]init];
@@ -99,7 +99,6 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
 	// Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-	//[self reachabilityChanged:nil];
 	[self reachabilityChanged:nil];
 }
 
@@ -136,9 +135,26 @@
     if (managedObjectContext != nil) {
         if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
              // Replace this implementation with code to handle the error appropriately.
-             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
+             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+            NSLog(@"Signal Tracker unable to save managerObjectContext.\nError: %@, %@", error, [error userInfo]);
+			NSString *message = nil;
+			if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] isEqualToString:DTDataStorageICloud]) {
+				id currentiCloudToken = [fileManager ubiquityIdentityToken];
+				NSData *newTokenData = [NSKeyedArchiver archivedDataWithRootObject:currentiCloudToken];
+				if (![[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.UbiquityIdentityToken"]isEqualToData:newTokenData]) {
+					message = @"Unable to save data to iCloud due to unknow iCloud account";
+				}else{
+					message = @"Unable to save data to iCloud. Please check settings.";
+				}
+			}else{
+				message = @"Signal Tracker was unable to save your data";
+			}
+			
+			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Failed to save!" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+			[alert show];
+			
+			[managedObjectContext rollback];
         } 
     }
 }
@@ -191,21 +207,19 @@
 
 		NSURL *localStoreURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:storeName];
 		NSMutableDictionary *options = [[NSMutableDictionary alloc]init];
+		[options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
+		[options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
 		
-		if([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"]isEqualToString: DTDataStorageICloud]){
+	if([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"]isEqualToString: DTDataStorageICloud]){
 			
 			
 			[options setObject:@"DataTracker_iCloud_Store" forKey:NSPersistentStoreUbiquitousContentNameKey];
-			[options setObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
-            [options setObject:[NSNumber numberWithBool:YES] forKey:NSInferMappingModelAutomaticallyOption];
-			
 			[_persistentStoreCoordinator lock];
 			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:options error:&error];
 			[_persistentStoreCoordinator unlock];
 			
 		}else{
 			[_persistentStoreCoordinator lock];
-			
 			[_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:localStoreURL options:nil error:&error];
 			[_persistentStoreCoordinator unlock];
 		}
@@ -231,10 +245,22 @@
 			 @{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
 			 
 			 Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
-			 
 			 */
+			NSString *message = nil;
 			NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-			abort();
+				//abort();
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+			if (![fileManager isWritableFileAtPath:localStoreURL.path]) {
+				NSLog(@"Directiony at path: %@, is not readable", localStoreURL.path);
+				message = @"Application is unable to create persistance store, and your data will not save";
+			}else{
+				message = @"Application data format has changed and older data has had to be removed";
+				[self resetLocalStorage];
+				UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Scheme" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+				[alert show];
+				return [self persistentStoreCoordinator];
+			}
+			
 		}
 	   
     return _persistentStoreCoordinator;
@@ -281,5 +307,28 @@
 -(void)userHasMadeStorageChoice{
 	NSNotification *notification = [NSNotification notificationWithName:UserChoseStorageTypeNotification object:nil];
 	[[NSNotificationCenter defaultCenter]postNotification:notification];
+}
+
+#pragma mark - RESET!
+-(BOOL)resetLocalStorage{
+	
+	_managedObjectContext = nil;
+	_managedObjectModel = nil;
+	_persistentStoreCoordinator = nil;
+	
+	NSFileManager *filemanager = [NSFileManager defaultManager];
+	NSString *storeName = @"DataTracker.sqlite";
+	NSURL *localStoreURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:storeName];
+	
+	NSError *error = nil;
+	
+	if ([filemanager fileExistsAtPath:localStoreURL.path]) {
+		[filemanager removeItemAtURL:localStoreURL error:&error];
+	}
+	if (error) {
+		NSLog(@"Failed to delete local store.\n %@", error);
+		return NO;
+	}
+	return YES;
 }
 @end

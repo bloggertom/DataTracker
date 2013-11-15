@@ -70,7 +70,7 @@
 	NSTimeInterval finish = [NSDate timeIntervalSinceReferenceDate];
 	NSNumber *resultSpeed = [NSNumber numberWithDouble:((dataSize / kBitInMb) / (finish - _start))];
 	[_speeds addObject:resultSpeed];
-	NSLog(@"Speed %f, %f, %ui", resultSpeed.doubleValue, finish-_start, data.length);
+	NSLog(@"Speed %f, %f, %lui", resultSpeed.doubleValue, finish-_start, (unsigned long)data.length);
 		//_start = finish;
 	[_data appendData:data];
 	

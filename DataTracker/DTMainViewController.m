@@ -41,7 +41,7 @@
 @property(nonatomic, strong)CLLocation *currentLocation;
 @property (nonatomic)UIBackgroundTaskIdentifier bgTask;
 @property (nonatomic)NSInteger MaxSpeed;
-
+@property (nonatomic, strong)UIButton *testButton;
 @end
 
 @implementation DTMainViewController
@@ -152,9 +152,29 @@
 
 		//add settings button
 	UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-	settingsButton.frame = CGRectMake(self.view.bounds.size.width-70, self.view.bounds.size.height-70, 80, 80);
+	settingsButton.frame = CGRectMake(self.view.bounds.size.width-70, self.view.bounds.size.height-90, 80, 80);
 	[settingsButton addTarget:self action:@selector(presentSettings) forControlEvents:UIControlEventTouchUpInside];
-
+	
+	_testButton = [UIButton buttonWithType:UIButtonTypeSystem];
+	[_testButton setTitle:@"Test Now" forState:UIControlStateNormal];
+	[_testButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+	[_testButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
+	[_testButton setBackgroundColor:[UIColor whiteColor]];
+	[_testButton setAlpha:0.6];
+	[_testButton sizeToFit];
+	CGRect bounds = _testButton.bounds;
+	bounds.size.height += 5;
+	bounds.size.width +=10;
+	_testButton.bounds = bounds;
+	CGRect frame = CGRectMake(20, self.view.frame.size.height - 70, _testButton.frame.size.width, _testButton.frame.size.height);
+	_testButton.frame = frame;
+	_testButton.layer.cornerRadius = 15;
+	_testButton.layer.borderColor = [UIColor grayColor].CGColor;
+	_testButton.layer.borderWidth = 1;
+	_testButton.enabled = NO;
+	[_testButton addTarget:self action:@selector(forceSpeedTest) forControlEvents:UIControlEventTouchUpInside];
+	
+	[self.view addSubview:_testButton];
 	[self.view addSubview:settingsButton];
 	
 	
@@ -189,7 +209,6 @@
 }
 
 #pragma mark - iCloud
-
 -(void)updateUi{
 		//reload on main thread for concurrency
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -207,6 +226,7 @@
 	NSLog(@"Tracking stopped");
 	[self.locationManager stopMonitoringSignificantLocationChanges];
 	self.tracking = NO;
+	[self trackingStatusHasChanged];
 }
 
 -(void)beginTracking{
@@ -217,7 +237,7 @@
 	[self.locationManager startMonitoringSignificantLocationChanges];
 #endif
 	self.tracking = YES;
-	
+	[self trackingStatusHasChanged];
 	
 #if DEBUG_OVERLAYS
 	_currentLocation = self.locationManager.location;
@@ -304,7 +324,7 @@
 	}
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
-	NSLog(@"Finished with Mbs %f", Mbs);
+	NSLog(@"Spped Test finished with Mbs %f", Mbs);
 	double result = Mbs;
 	if (Mbs > _MaxSpeed) {
 		result = _MaxSpeed;
@@ -428,12 +448,13 @@
 }
 
 #pragma mark - settings controller handlers
-
 -(void)switchValueDidChanged:(BOOL)on{
+		//4G switch changed
 	[self correctMaxSpeed];
 }
 -(void)correctMaxSpeed{
-		//NSString *model = [DTMainViewController getModel];
+		//Usually checking models isn't acceptable but there is no why to check for a
+		// Phones available data types so this will have to do.
 	if ([DTMainViewController FourGEnabledModel]) {
 		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 		if ([defaults boolForKey:kDataType4G]) {
@@ -467,6 +488,7 @@
 	}
 }
 -(void)presentSettings{
+		//Build and present settings controller
 	DTSettingsViewController *settingsViewController = [[DTSettingsViewController alloc]init];
 	settingsViewController.modalTransitionStyle = UIModalTransitionStylePartialCurl;
 	settingsViewController.callBack = self;
@@ -503,13 +525,35 @@
 }
 
 #pragma mark - Overlay Description Callback
-
 -(void)userDidRequestRemovalOfOverlay:(DTMergableCircleOverlay *)overlay{
 		//remove overlay from map
 	[_mapview removeOverlay:overlay];
 	[_mapview removeAnnotation:overlay];
 		//remove from context by calling this callback back method for the map delegate
 	[self mapViewDelegateDidRemoveOverlay:overlay];
+}
+
+#pragma mark - Test Button Handlers
+
+-(void)trackingStatusHasChanged{
+	if (_testButton != nil) {
+		if (self.isTracking) {
+			_testButton.layer.borderColor = [UIColor redColor].CGColor;
+			_testButton.enabled = YES;
+		}else{
+			_testButton.layer.borderColor = [UIColor grayColor].CGColor;
+			_testButton.enabled = NO;
+		}
+	}
+}
+
+-(void)forceSpeedTest{
+	if (self.isTracking) {
+		[self locationManagerHasUpdatedToLoaction:_locationManager.location];
+	}else{
+		UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Sorry" message:@"This options isn't available while the device is connection to the internet via WiFi" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+		[alert show];
+	}
 }
 
 @end
