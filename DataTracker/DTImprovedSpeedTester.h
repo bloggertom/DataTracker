@@ -15,6 +15,6 @@
 
 -(void)checkSpeed;
 -(void)forceDownloadToFinish;
-
+-(void)cancelSpeedTest;
 
 @end

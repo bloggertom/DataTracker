@@ -7,6 +7,7 @@
 //
 
 #include <sys/sysctl.h>
+#import <iAd/iAd.h>
 
 #import "DTMainViewController.h"
 #import "DTLocationDelegate.h"
@@ -19,6 +20,10 @@
 #import "DTSettingsViewController.h"
 #import "DTOverlayDetailViewController.h"
 #import "DTImprovedSpeedTester.h"
+#import "GAI.h"
+#import "GAIDictionaryBuilder.h"
+#import "GAIFields.h"
+
 	//White Box Test cases
 #define DEBUG_OVERLAYS 0
 #define FIELD_TEST 0
@@ -41,7 +46,9 @@
 @property(nonatomic, strong)CLLocation *currentLocation;
 @property (nonatomic)UIBackgroundTaskIdentifier bgTask;
 @property (nonatomic)NSInteger MaxSpeed;
-@property (nonatomic, strong)UIButton *testButton;
+@property (nonatomic, weak)IBOutlet UIButton *testButton;
+@property (nonatomic, weak)IBOutlet UIButton *settingsButton;
+@property (nonatomic, strong)id<GAITracker> tracker;
 @end
 
 @implementation DTMainViewController
@@ -58,18 +65,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	_tracker = [[GAI sharedInstance] defaultTracker];
 	// Do any additional setup after loading the view.
 	[self correctMaxSpeed];
+	self.canDisplayBannerAds = YES;
 	
-	
+		//self.originalContentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+		//self.originalContentView.autoresizesSubviews = YES;
 		//set up map view
-	_mapview = [[MKMapView alloc]initWithFrame:self.view.bounds];
+		//_mapview = [[MKMapView alloc]initWithFrame:self.originalContentView.bounds];
 	_mapViewDelegate = [[DTMapViewDelegate alloc]init];
 	_mapViewDelegate.callback = self;
 	_mapview.delegate = _mapViewDelegate;
 	_mapview.showsUserLocation = YES;
 	_mapview.mapType = [[NSUserDefaults standardUserDefaults]integerForKey:kMapType];
-	
 	
 		//set up location manager
 	_locationDelegate = [[DTLocationDelegate alloc]init];
@@ -87,17 +96,10 @@
 #if DEBUG_BACKGROUND_ACTIVITY
 	_locationManager.distanceFilter = DistanceFilter;
 #endif
-		//track user location. May not be needed?
-		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
-	
-	
-		//speedTester
-		//_speedTester = [[DTSpeedTester alloc]init];
+		
 	_speedTester = [[DTImprovedSpeedTester alloc]init];
 	_speedTester.callback = self;
 	
-	
-	[self.view addSubview:_mapview];
 	[self setUpUI];
 	
 		//if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] isEqualToString:DTDataStorageICloud]) {
@@ -107,10 +109,16 @@
 	[[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadOverlays) name:UserChoseStorageTypeNotification object:nil];
 	
 }
+-(void)viewDidDisappear:(BOOL)animated{
+	[super viewDidDisappear:animated];
+	if (self.presentingFullScreenAd && self.speedTester.isTesting) {
+		[self.speedTester cancelSpeedTest];
+	}
+}
 -(void)centerOnUser{
 	NSLog(@"Center On user");
 	[_mapview setRegion:MKCoordinateRegionMakeWithDistance(self.mapview.userLocation.coordinate, 1500, 1500)animated:YES];
-	
+		//[_mapview setUserTrackingMode:MKUserTrackingModeFollow];
 }
 
 -(void)dealloc{
@@ -143,41 +151,16 @@
 
 #pragma mark - set up methods
 -(void)setUpUI{
-	
-		//add progress label
-	_progressLabel = [[UILabel alloc]initWithFrame:CGRectMake(20, 20, 200, 50)];
-		//self.progressLabel.textColor = [UIColor lightTextColor];
 	_progressLabel.alpha = 0;
-	[self.view addSubview:_progressLabel];
 
-		//add settings button
-	UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-	settingsButton.frame = CGRectMake(self.view.bounds.size.width-70, self.view.bounds.size.height-90, 80, 80);
-	[settingsButton addTarget:self action:@selector(presentSettings) forControlEvents:UIControlEventTouchUpInside];
-	
-	_testButton = [UIButton buttonWithType:UIButtonTypeSystem];
 	[_testButton setTitle:@"Test Now" forState:UIControlStateNormal];
 	[_testButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
 	[_testButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
 	[_testButton setBackgroundColor:[UIColor whiteColor]];
 	[_testButton setAlpha:0.6];
-	[_testButton sizeToFit];
-	CGRect bounds = _testButton.bounds;
-	bounds.size.height += 5;
-	bounds.size.width +=10;
-	_testButton.bounds = bounds;
-	CGRect frame = CGRectMake(20, self.view.frame.size.height - 70, _testButton.frame.size.width, _testButton.frame.size.height);
-	_testButton.frame = frame;
 	_testButton.layer.cornerRadius = 15;
 	_testButton.layer.borderColor = [UIColor grayColor].CGColor;
 	_testButton.layer.borderWidth = 1;
-	_testButton.enabled = NO;
-	[_testButton addTarget:self action:@selector(forceSpeedTest) forControlEvents:UIControlEventTouchUpInside];
-	
-	[self.view addSubview:_testButton];
-	[self.view addSubview:settingsButton];
-	
-	
 }
 
 -(void)loadOverlays{
@@ -224,6 +207,9 @@
 #pragma mark - Tracking
 - (void)stopTracking{
 	NSLog(@"Tracking stopped");
+	
+	[_tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Tracking" action:@"Stop" label:@"stop" value:nil]build]];
+	
 	[self.locationManager stopMonitoringSignificantLocationChanges];
 	self.tracking = NO;
 	[self trackingStatusHasChanged];
@@ -231,6 +217,9 @@
 
 -(void)beginTracking{
 	NSLog(@"Tracking");
+	
+	[_tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Tracking" action:@"Start Tracking" label:@"Start" value:nil]build]];
+	
 #if DEBUG_BACKGROUND_ACTIVITY
 	[self.locationManager startUpdatingLocation];
 #else
@@ -266,7 +255,6 @@
 
 -(void)mapFinishedInitialRenderingSuccessfully:(BOOL)success{
 	[self.reach startNotifier];
-	NSLog(@"Moo");
 	if ([[NSUserDefaults standardUserDefaults]objectForKey:@"com.apple.DataTracker.StorageType"] != nil) {
 			[self loadOverlays];
 	}
@@ -276,13 +264,14 @@
 #pragma mark - Location Updates
 -(void)locationManagerHasUpdatedToLoaction:(CLLocation *)location{
 	if(_speedTester.isTesting){
-		NSLog(@"speed tester busy");
+		NSLog(@"Speed tester busy, returning");
 		return;
 	}
 	_currentLocation = location;
-	if([[UIApplication sharedApplication]applicationState] == UIApplicationStateActive){
+	if([[UIApplication sharedApplication]applicationState] != UIApplicationStateBackground){
+		[self.testButton setTitle:@"Stop Test" forState:UIControlStateNormal];
 		self.progressLabel.text = @"Testing Connection";
-		[UIView animateWithDuration:0.5 animations:^{
+		[UIView animateWithDuration:0.3 animations:^{
 			self.progressLabel.alpha = 1;
 		} completion:^(BOOL finished) {
 			
@@ -313,7 +302,6 @@
 		perProgress = 100;
 	}
 	self.progressLabel.text = [NSString stringWithFormat:@"%d%%",perProgress];
-	self.progressLabel.alpha = 1;
 	
 	if (_bgTask != UIBackgroundTaskInvalid) {
 		if ([[UIApplication sharedApplication]backgroundTimeRemaining] < 10) {
@@ -324,7 +312,9 @@
 	}
 }
 -(void)speedTesterDidFinishSpeedTestWithResult:(double)Mbs{
-	NSLog(@"Spped Test finished with Mbs %f", Mbs);
+		//NSLog(@"Spped Test finished with Mbs %f", Mbs);
+	[_tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"SpeedTester" action:@"End Speed Test" label:@"Call Back" value:nil]build]];
+	
 	double result = Mbs;
 	if (Mbs > _MaxSpeed) {
 		result = _MaxSpeed;
@@ -356,9 +346,16 @@
 	[UIView animateWithDuration:1.5 delay:2 options:UIViewAnimationOptionCurveEaseInOut animations:^{
 		self.progressLabel.alpha = 0;
 	} completion:nil];
+	[self.testButton setTitle:@"Test Now" forState:UIControlStateNormal];
+}
+-(void)speedTestDidCancel{
+	
+	[self.testButton setTitle:@"Test Now" forState:UIControlStateNormal];
+	[UIView animateWithDuration:0.3 animations:^{
+		self.progressLabel.alpha = 0;
+	}];
 	
 }
-
 #pragma mark - Mapview Delegate Callbacks
 -(void)mapViewDelegateDidAddOverlay:(id<MKOverlay>)overlay{
 #if !DEBUG_OVERLAYS
@@ -487,7 +484,7 @@
 			break;
 	}
 }
--(void)presentSettings{
+-(IBAction)presentSettings{
 		//Build and present settings controller
 	DTSettingsViewController *settingsViewController = [[DTSettingsViewController alloc]init];
 	settingsViewController.modalTransitionStyle = UIModalTransitionStylePartialCurl;
@@ -539,20 +536,25 @@
 	if (_testButton != nil) {
 		if (self.isTracking) {
 			_testButton.layer.borderColor = [UIColor redColor].CGColor;
-			_testButton.enabled = YES;
+			[_testButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
 		}else{
 			_testButton.layer.borderColor = [UIColor grayColor].CGColor;
-			_testButton.enabled = NO;
+			[_testButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
 		}
 	}
 }
 
--(void)forceSpeedTest{
-	if (self.isTracking) {
-		[self locationManagerHasUpdatedToLoaction:_locationManager.location];
+-(IBAction)forceSpeedTest{
+	if (self.speedTester.testing) {
+		[self.speedTester cancelSpeedTest];
+		
 	}else{
-		UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Sorry" message:@"This options isn't available while the device is connection to the internet via WiFi" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-		[alert show];
+		if (self.isTracking) {
+			[self locationManagerHasUpdatedToLoaction:_locationManager.location];
+		}else{
+			UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Sorry" message:@"You must not be connected to Wifi in order to test the speed of your data connection." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+			[alert show];
+		}
 	}
 }
 

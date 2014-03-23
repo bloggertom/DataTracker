@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M7T-Fg-IpT">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+    </dependencies>
+    <scenes>
+        <!--Main View Controller-->
+        <scene sceneID="0YP-lM-3yK">
+            <objects>
+                <viewController id="M7T-Fg-IpT" customClass="DTMainViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="ifi-i6-5i5"/>
+                        <viewControllerLayoutGuide type="bottom" id="ztM-XT-ks9"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="QPI-1h-eOl">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="7QJ-cM-dGo">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="568" id="7H8-1G-63t"/>
+                                    <constraint firstAttribute="width" constant="320" id="dgb-uh-fak"/>
+                                </constraints>
+                            </mapView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nt9-Ml-qQi">
+                                <rect key="frame" x="278" y="526" width="22" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="GUM-t6-oAM"/>
+                                    <constraint firstAttribute="width" constant="22" id="oJW-NY-34W"/>
+                                </constraints>
+                                <state key="normal">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="presentSettings" destination="M7T-Fg-IpT" eventType="touchUpInside" id="a5O-hV-COj"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kfw-c8-dv4">
+                                <rect key="frame" x="20" y="518" width="80" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="Muf-AG-1jv"/>
+                                    <constraint firstAttribute="height" constant="30" id="RdT-wV-3fO"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <state key="normal" title="Test Now">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="forceSpeedTest" destination="M7T-Fg-IpT" eventType="touchUpInside" id="ut7-2v-EQp"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bEO-kq-1i6">
+                                <rect key="frame" x="20" y="49" width="142" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="bP8-f8-V3K"/>
+                                    <constraint firstAttribute="width" constant="142" id="qSj-wL-h9A"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="ztM-XT-ks9" firstAttribute="top" secondItem="Kfw-c8-dv4" secondAttribute="bottom" constant="20" id="9JO-Sx-Qhn"/>
+                            <constraint firstAttribute="trailing" secondItem="7QJ-cM-dGo" secondAttribute="trailing" id="Bvy-qp-LUy"/>
+                            <constraint firstItem="7QJ-cM-dGo" firstAttribute="top" secondItem="QPI-1h-eOl" secondAttribute="top" id="FfM-LX-aym"/>
+                            <constraint firstItem="bEO-kq-1i6" firstAttribute="leading" secondItem="QPI-1h-eOl" secondAttribute="leading" constant="20" id="LMz-qj-am1"/>
+                            <constraint firstItem="bEO-kq-1i6" firstAttribute="top" secondItem="ifi-i6-5i5" secondAttribute="bottom" constant="29" id="Qs9-xf-fdM"/>
+                            <constraint firstItem="ztM-XT-ks9" firstAttribute="top" secondItem="nt9-Ml-qQi" secondAttribute="bottom" constant="20" id="TAf-JV-iXz"/>
+                            <constraint firstAttribute="trailing" secondItem="nt9-Ml-qQi" secondAttribute="trailing" constant="20" id="ViF-A0-IMs"/>
+                            <constraint firstItem="Kfw-c8-dv4" firstAttribute="leading" secondItem="QPI-1h-eOl" secondAttribute="leading" constant="20" id="dgk-9F-Mz9"/>
+                            <constraint firstItem="ztM-XT-ks9" firstAttribute="top" secondItem="7QJ-cM-dGo" secondAttribute="bottom" id="kWB-LN-xW6"/>
+                            <constraint firstItem="7QJ-cM-dGo" firstAttribute="leading" secondItem="QPI-1h-eOl" secondAttribute="leading" id="oxS-fg-ouW"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="mapview" destination="7QJ-cM-dGo" id="B87-qD-0pH"/>
+                        <outlet property="progressLabel" destination="bEO-kq-1i6" id="hpb-mL-8nY"/>
+                        <outlet property="settingsButton" destination="nt9-Ml-qQi" id="RNo-xB-Jaf"/>
+                        <outlet property="testButton" destination="Kfw-c8-dv4" id="pCQ-Ib-jqk"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="BBa-3C-1bi" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="181" y="-135"/>
+        </scene>
+    </scenes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+</document>

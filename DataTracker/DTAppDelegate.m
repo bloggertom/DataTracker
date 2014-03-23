@@ -10,8 +10,11 @@
 #import "DTMainViewController.h"
 #import "Reachability.h"
 #import "DTiPadViewController.h"
+#import "GAI.h"
+#import "GAIDictionaryBuilder.h"
+#import "GAIFields.h"
 #define DEBUG_ALERTVIEW 0
-
+#define DEBUG_GOOGLE 1
 
 @interface DTAppDelegate ()
 @property (nonatomic, strong)NSURL *ubiquityContainerURL;
@@ -26,7 +29,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		//self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
 	//[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 
@@ -57,9 +60,12 @@
 		//check reachability
 		_reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
 		_reachability.reachableOnWWAN = YES;
-		_mainIPhoneController = [[DTMainViewController alloc]init];
+		_mainIPhoneController = (DTMainViewController *)self.window.rootViewController;
 		_mainIPhoneController.reach = _reachability;
-		self.window.rootViewController = _mainIPhoneController;
+		/*_mainIPhoneController = [[DTMainViewController alloc]init];
+		
+		self.window.rootViewController = _mainIPhoneController;*/
+		
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(reachabilityChanged:)
 													 name:kReachabilityChangedNotification
@@ -67,12 +73,18 @@
 		
 		[self reachabilityChanged:nil];
 	}
-    [self.window makeKeyAndVisible];
+	
+	[GAI sharedInstance].trackUncaughtExceptions = YES;
+#if DEBUG_GOOGLE
+	id<GAITracker> tracker = [[GAI sharedInstance] trackerWithTrackingId:@"UA-49282504-3"];
+#else
+	id<GAITracker> tracker = [[GAI sharedInstance] trackerWithTrackingId:@"UA-49282504-1"];
+#endif
+	[tracker send:[[[GAIDictionaryBuilder createEventWithCategory:@"UX"
+                                                           action:@"appstart"
+                                                            label:nil
+                                                            value:nil] set:@"start" forKey:kGAISessionControl] build]];
 
-	
-	
-	
-	
     return YES;
 }
 
@@ -89,7 +101,7 @@
 	// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 	NSLog(@"App entering background");
 		//[self reachabilityChanged:nil];
-	if (_mainIPhoneController) {
+	if (_mainIPhoneController && _reachability.isReachableViaWWAN) {
 		[_mainIPhoneController beginTracking];
 	}
 	
@@ -116,6 +128,11 @@
 	if (_mainIPhoneController) {
 		[_mainIPhoneController stopTracking];
 	}
+	id <GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+	[tracker send:[[[GAIDictionaryBuilder createEventWithCategory:@"UX"
+                                                           action:@"appfinish"
+                                                            label:nil
+                                                            value:nil] set:@"end" forKey:kGAISessionControl] build]];
 	[self saveContext];
 }
 

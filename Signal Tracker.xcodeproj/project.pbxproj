@@ -13,6 +13,11 @@
 		DB7BEA40181D81CA004655B2 /* DTMMergableOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA3F181D81CA004655B2 /* DTMMergableOverlay.m */; };
 		DB7BEA43181F3EE5004655B2 /* DTSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */; };
 		DB9525E417FF81DD00D09B9E /* DTSpeedTester.m in Sources */ = {isa = PBXBuildFile; fileRef = DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */; };
+		DBBD662818DE600900726B9D /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBD662718DE600900726B9D /* iAd.framework */; };
+		DBCEAC2818DEF7BD00FFBAF8 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBCEAC2718DEF7BD00FFBAF8 /* MainStoryboard.storyboard */; };
+		DBCEAC2A18DF00EF00FFBAF8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = DBCEAC2918DF00EF00FFBAF8 /* libz.dylib */; };
+		DBCEAC2C18DF010500FFBAF8 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBCEAC2B18DF010500FFBAF8 /* AdSupport.framework */; };
+		DBCEAC3718DF01F300FFBAF8 /* libGoogleAnalyticsServices.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBCEAC3618DF01F300FFBAF8 /* libGoogleAnalyticsServices.a */; };
 		DBF8C49B18132A73001911C9 /* DTMergableCircleOverlay.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */; };
 		DBF8C49E18134454001911C9 /* DTMergableRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = DBF8C49D18134454001911C9 /* DTMergableRenderer.m */; };
 		DBF984E117FF2E2D00A75DF1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF984E017FF2E2D00A75DF1 /* Foundation.framework */; };
@@ -62,6 +67,17 @@
 		DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTSettingsViewController.m; sourceTree = "<group>"; };
 		DB9525E217FF81DD00D09B9E /* DTSpeedTester.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTSpeedTester.h; sourceTree = "<group>"; };
 		DB9525E317FF81DD00D09B9E /* DTSpeedTester.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTSpeedTester.m; sourceTree = "<group>"; };
+		DBBD662718DE600900726B9D /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
+		DBCEAC2718DEF7BD00FFBAF8 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		DBCEAC2918DF00EF00FFBAF8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		DBCEAC2B18DF010500FFBAF8 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
+		DBCEAC3018DF01E700FFBAF8 /* GAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAI.h; sourceTree = "<group>"; };
+		DBCEAC3118DF01E700FFBAF8 /* GAIDictionaryBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAIDictionaryBuilder.h; sourceTree = "<group>"; };
+		DBCEAC3218DF01E700FFBAF8 /* GAIFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAIFields.h; sourceTree = "<group>"; };
+		DBCEAC3318DF01E700FFBAF8 /* GAILogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAILogger.h; sourceTree = "<group>"; };
+		DBCEAC3418DF01E700FFBAF8 /* GAITrackedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITrackedViewController.h; sourceTree = "<group>"; };
+		DBCEAC3518DF01E700FFBAF8 /* GAITracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITracker.h; sourceTree = "<group>"; };
+		DBCEAC3618DF01F300FFBAF8 /* libGoogleAnalyticsServices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGoogleAnalyticsServices.a; sourceTree = "<group>"; };
 		DBCF2832182ED302000A5A4B /* Signal Tracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Signal Tracker.entitlements"; sourceTree = SOURCE_ROOT; };
 		DBF8C49918132A73001911C9 /* DTMergableCircleOverlay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DTMergableCircleOverlay.h; sourceTree = "<group>"; };
 		DBF8C49A18132A73001911C9 /* DTMergableCircleOverlay.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DTMergableCircleOverlay.m; sourceTree = "<group>"; };
@@ -103,11 +119,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBCEAC2C18DF010500FFBAF8 /* AdSupport.framework in Frameworks */,
+				DBCEAC2A18DF00EF00FFBAF8 /* libz.dylib in Frameworks */,
+				DBBD662818DE600900726B9D /* iAd.framework in Frameworks */,
 				DBF9852517FF49CA00A75DF1 /* SystemConfiguration.framework in Frameworks */,
 				DBF9852317FF3D4400A75DF1 /* CoreLocation.framework in Frameworks */,
 				DBF9852117FF3D2D00A75DF1 /* MapKit.framework in Frameworks */,
 				DBF984E317FF2E2D00A75DF1 /* CoreGraphics.framework in Frameworks */,
 				DBF984E717FF2E2D00A75DF1 /* CoreData.framework in Frameworks */,
+				DBCEAC3718DF01F300FFBAF8 /* libGoogleAnalyticsServices.a in Frameworks */,
 				DBF984E517FF2E2D00A75DF1 /* UIKit.framework in Frameworks */,
 				DBF984E117FF2E2D00A75DF1 /* Foundation.framework in Frameworks */,
 			);
@@ -138,6 +158,7 @@
 				DB7BEA42181F3EE5004655B2 /* DTSettingsViewController.m */,
 				DB102720182D4D130027BC4E /* DTOverlayDetailViewController.h */,
 				DB102721182D4D130027BC4E /* DTOverlayDetailViewController.m */,
+				DBCEAC2718DEF7BD00FFBAF8 /* MainStoryboard.storyboard */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -153,9 +174,40 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+		DBCEAC2D18DF019600FFBAF8 /* GoogleAnalytics */ = {
+			isa = PBXGroup;
+			children = (
+				DBCEAC3618DF01F300FFBAF8 /* libGoogleAnalyticsServices.a */,
+				DBCEAC2E18DF01AD00FFBAF8 /* headers */,
+			);
+			name = GoogleAnalytics;
+			sourceTree = "<group>";
+		};
+		DBCEAC2E18DF01AD00FFBAF8 /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				DBCEAC2F18DF01E700FFBAF8 /* Library */,
+			);
+			name = headers;
+			sourceTree = "<group>";
+		};
+		DBCEAC2F18DF01E700FFBAF8 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				DBCEAC3018DF01E700FFBAF8 /* GAI.h */,
+				DBCEAC3118DF01E700FFBAF8 /* GAIDictionaryBuilder.h */,
+				DBCEAC3218DF01E700FFBAF8 /* GAIFields.h */,
+				DBCEAC3318DF01E700FFBAF8 /* GAILogger.h */,
+				DBCEAC3418DF01E700FFBAF8 /* GAITrackedViewController.h */,
+				DBCEAC3518DF01E700FFBAF8 /* GAITracker.h */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
 		DBF984D417FF2E2D00A75DF1 = {
 			isa = PBXGroup;
 			children = (
+				DBCEAC2D18DF019600FFBAF8 /* GoogleAnalytics */,
 				DBF984E817FF2E2D00A75DF1 /* Signal Tracker */,
 				DBF9850517FF2E2D00A75DF1 /* DataTrackerTests */,
 				DBF984DF17FF2E2D00A75DF1 /* Frameworks */,
@@ -175,6 +227,9 @@
 		DBF984DF17FF2E2D00A75DF1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DBCEAC2B18DF010500FFBAF8 /* AdSupport.framework */,
+				DBCEAC2918DF00EF00FFBAF8 /* libz.dylib */,
+				DBBD662718DE600900726B9D /* iAd.framework */,
 				DBF9852417FF49CA00A75DF1 /* SystemConfiguration.framework */,
 				DBF9852217FF3D4400A75DF1 /* CoreLocation.framework */,
 				DBF9852017FF3D2D00A75DF1 /* MapKit.framework */,
@@ -334,6 +389,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBCEAC2818DEF7BD00FFBAF8 /* MainStoryboard.storyboard in Resources */,
 				DBF984ED17FF2E2D00A75DF1 /* InfoPlist.strings in Resources */,
 				DBF984F817FF2E2D00A75DF1 /* Images.xcassets in Resources */,
 			);
@@ -494,8 +550,12 @@
 				GCC_PREFIX_HEADER = "DataTracker/Signal Tracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/Signal Tracker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "Signal Tracker";
-				PROVISIONING_PROFILE = "BBA64A51-96D9-4943-9AB1-9539CFEF6C6C";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -513,8 +573,12 @@
 				GCC_PREFIX_HEADER = "DataTracker/Signal Tracker-Prefix.pch";
 				INFOPLIST_FILE = "DataTracker/Signal Tracker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "Signal Tracker";
-				PROVISIONING_PROFILE = "BBA64A51-96D9-4943-9AB1-9539CFEF6C6C";
+				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
